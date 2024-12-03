@@ -4,13 +4,13 @@ import { StyleSheet } from 'react-native';
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#FFFFF",
+    backgroundColor: "#FFFFFF",
     justifyContent: 'center',
     alignItems: 'center',
     paddingBottom: 20,
   },
   imgLogo: {
-    width: 320,
+    width: 440,
     height: 320,
   },
   txt_container: {

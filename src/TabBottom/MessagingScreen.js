@@ -6,6 +6,7 @@ import {
   View,
   TextInput,
   TouchableOpacity,
+  RefreshControl, // Import RefreshControl
 } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import moment from 'moment';
@@ -38,6 +39,7 @@ const MessagingScreen = () => {
   const [filteredData, setFilteredData] = useState([]);
   const [conversations, setConversations] = useState([]);
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const [noConversationsMessage, setNoConversationsMessage] = useState(''); 
   const navigation = useNavigation();
   const route = useRoute();
 
@@ -47,23 +49,25 @@ const MessagingScreen = () => {
     try {
       const response = await fetch(`${BASE_URL}/message/getConversationsForUser/${userID}`);
       const conversations = await response.json();
-  
+
+      // Ensure conversations is an array, even if empty or undefined
+      const validConversations = Array.isArray(conversations) ? conversations : [];
+
       const getConversationDetails = async (conversation) => {
         const [teacher, messagesData] = await Promise.all([
           fetch(`${BASE_URL}/teacher/getTeacherByID/${conversation._id}`).then(res => res.json()),
           fetch(`${BASE_URL}/message/getMessages/${userID}/${conversation._id}`).then(res => res.json())
         ]);
-      
+
         const { avatar } = teacher;
         const messages = messagesData.messages || [];
         const latestMessage = messages.sort((a, b) => b.timestamp - a.timestamp)[0] || {};
-      
+
         const status = latestMessage.senderId === userID ? 'watch' : 'notwatch';
-        
-        // Ensure that senderId and receiverId are correctly set from the latest message
+
         const senderId = latestMessage.senderId || null;
         const receiverId = latestMessage.receiverId || null;
-  
+
         return {
           ...conversation,
           nameUser: conversation.name || 'Unknown User',
@@ -73,19 +77,29 @@ const MessagingScreen = () => {
           time: latestMessage.timestamp ? moment(latestMessage.timestamp).format('YYYY-MM-DD HH:mm:ss') : '',
           numberOfMessages: messages.length,
           status: status,
-          senderId,  
-          receiverId,  
+          senderId,
+          receiverId,
         };
       };
-  
-      const updatedData = await Promise.all(conversations.map(getConversationDetails));
-      setConversations(updatedData);
-      setFilteredData(updatedData);
+
+      // Update message when no conversations exist
+      if (validConversations.length === 0) {
+        setConversations([]);
+        setFilteredData([]);
+        setNoConversationsMessage('Hộp thư của bạn trống');
+      } else {
+        const updatedData = await Promise.all(validConversations.map(getConversationDetails));
+        setConversations(updatedData);
+        setFilteredData(updatedData);
+        setNoConversationsMessage(''); // Reset message when there are conversations
+      }
     } catch (error) {
       console.error(error);
       setFilteredData([]);
+      setNoConversationsMessage('Không thể tải hộp thư');
     }
   };
+
   useEffect(() => {
     fetchConversations();
   }, [userID]);
@@ -122,12 +136,12 @@ const MessagingScreen = () => {
   // Handle item click
   const handleItemClick = (item) => {
     const { status, receiverId, senderId, nameUser, time } = item;
-  
+
     // Cập nhật trạng thái trực tiếp trong dữ liệu
     if (status === 'notwatch') {
       item.status = 'watch'; // Thay đổi trạng thái cục bộ
     }
-  
+
     // Chuẩn bị dữ liệu để truyền
     const data = {
       userID,
@@ -137,10 +151,10 @@ const MessagingScreen = () => {
       senderName: nameUser,
       receiverName: nameUser,
     };
-  
+
     // Log dữ liệu trước khi chuyển hướng
     console.log('Dữ liệu truyền đến BoxChat:', data);
-  
+
     // Chuyển hướng đến màn hình BoxChat
     navigation.navigate('BoxChat', data);
   };
@@ -181,7 +195,7 @@ const MessagingScreen = () => {
       </View>
     </TouchableOpacity>
   );
-  
+
   return (
     <View style={styles.container}>
       <View style={styles.header}>
@@ -209,15 +223,25 @@ const MessagingScreen = () => {
         </TouchableOpacity>
       </View>
       <View style={styles.body}>
-        <FlatList
-          data={sortedData}
-          renderItem={renderItem}
-          keyExtractor={(item) => item.nameUser + item._id}
-          showsVerticalScrollIndicator={false}
-          ItemSeparatorComponent={() => <View style={styles.separator} />}
-          onRefresh={handleRefresh}
-          refreshing={isRefreshing}
-        />
+        {noConversationsMessage ? (
+          <FlatList
+            data={[]}
+            renderItem={() => <Text style={styles.emptyInboxMessage}>{noConversationsMessage}</Text>}
+            keyExtractor={() => 'no-conversations'}
+            refreshControl={<RefreshControl refreshing={isRefreshing} onRefresh={handleRefresh} />}
+          />
+        ) : (
+          <FlatList
+            data={sortedData}
+            renderItem={renderItem}
+            keyExtractor={(item) => item.nameUser + item._id}
+            showsVerticalScrollIndicator={false}
+            ItemSeparatorComponent={() => <View style={styles.separator} />}
+            onRefresh={handleRefresh}
+            refreshing={isRefreshing}
+            refreshControl={<RefreshControl refreshing={isRefreshing} onRefresh={handleRefresh} />}
+          />
+        )}
       </View>
     </View>
   );

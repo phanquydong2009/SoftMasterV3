@@ -13,13 +13,13 @@ import styles from '../stylesTabBottom/CourseScreenStyles';
 import BASE_URL from '../component/apiConfig';
 
 const CourseScreen = ({ route }) => {
-  const { userID } = route.params;
+  const { userID ,courseIdDone} = route.params;
   const [selected, setSelected] = useState(1);
   const [courses, setCourses] = useState([]);
-  const [searchQuery, setSearchQuery] = useState(''); // State lưu trữ từ khóa tìm kiếm
-  const [refreshing, setRefreshing] = useState(false); // State for pull-to-refresh
+  const [searchQuery, setSearchQuery] = useState('');
+  const [refreshing, setRefreshing] = useState(false); 
   const navigation = useNavigation();
-
+ console.log('Dữ liệu nhận : ', userID ,courseIdDone)
   // Đưa fetchCourses ra ngoài useEffect và sử dụng useCallback để tránh tạo lại function không cần thiết
   const fetchCourses = useCallback(async () => {
     try {

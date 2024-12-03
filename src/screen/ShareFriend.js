@@ -2,13 +2,14 @@ import React from 'react';
 import {
   View,
   Text,
-
   TouchableOpacity,
   Image,
-
+  Linking,
+  Platform
 } from 'react-native';
 import ToolBar from '../component/ToolBar';
 import styles from '../styles/ShareFriend';
+
 const contacts = [
   { id: '1', name: 'Rani Thomas', phone: '(+91) 702-897-7965', active: true },
   { id: '2', name: 'Anastasia', phone: '(+91) 702-897-7965', active: true },
@@ -50,12 +51,53 @@ const FooterList = () => {
     { name: 'Line', icon: 'https://img.icons8.com/color/48/000000/line-me.png' },
   ];
 
+  const handleShare = (platform) => {
+    const shareData = {
+      title: 'Mời bạn bè của bạn!',
+      text: 'Chào bạn, mình vừa tìm được ứng dụng thú vị này, hãy thử xem nhé!',
+      url: 'https://yourapp.com',
+
+    };
+
+    if (Platform.OS === 'web' && navigator.share) {
+      // Web Share API available on web
+      navigator.share(shareData)
+        .then(() => console.log('Share successful'))
+        .catch((error) => console.log('Error sharing:', error));
+    } else {
+      // Fallback for mobile platforms, use Linking to open URLs in a browser
+      let url = '';
+      switch (platform) {
+        case 'Facebook':
+          url = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareData.url)}`;
+          break;
+        case 'X':
+          url = `https://twitter.com/intent/tweet?url=${encodeURIComponent(shareData.url)}&text=${encodeURIComponent(shareData.text)}`;
+          break;
+        case 'Google':
+          url = `https://plus.google.com/share?url=${encodeURIComponent(shareData.url)}`;
+          break;
+        case 'Line':
+          url = `https://social-plugins.line.me/lineit/share?url=${encodeURIComponent(shareData.url)}`;
+          break;
+        default:
+          return;
+      }
+      // Use Linking to open the URL in an external browser or app
+      Linking.openURL(url).catch((err) => console.error('Error opening URL:', err));
+    }
+  };
+
   return (
     <View style={styles.footerContainer}>
       <Text style={styles.footerTitle}>Chia sẻ mời qua</Text>
       <View style={styles.iconContainer}>
         {socialIcons.map((item) => (
-          <TouchableOpacity key={item.name} style={styles.iconButton}>
+          <TouchableOpacity
+            key={item.name}
+            style={styles.iconButton}
+            onPress={() => handleShare(item.name)}
+          >
             <Image
               source={{ uri: item.icon }}
               style={styles.iconImage}
@@ -76,6 +118,5 @@ const ShareFriend = () => (
     <FooterList />
   </View>
 );
-
 
 export default ShareFriend;

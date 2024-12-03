@@ -58,7 +58,7 @@ const CustomAlert = ({ visible, score, scoreType, userID, testId }) => {
       <View style={styles.modalBackground}>
         <View style={styles.modalContainer}>
           <Image
-            source={require('../design/image/chucmung.png')}
+            source={require('../design/image/sss.jpg')}
             style={styles.modalImage}
           />
           <Text style={styles.modalHeaderText}>Xin chúc mừng</Text>

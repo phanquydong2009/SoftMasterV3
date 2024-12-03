@@ -83,16 +83,17 @@ const QuizzCourse = () => {
         const averageScore = (score / questions.length) * 10;
         let scoreType;
 
-        // Phân loại điểm
+        // Phân loại điểm với mô tả chi tiết hơn
         if (averageScore >= 0 && averageScore < 5) {
-          scoreType = 'Yếu';
+          scoreType = 'Hạng đạt yếu - Cần cố gắng nhiều hơn để đạt được kết quả tốt hơn.';
         } else if (averageScore >= 5 && averageScore < 7) {
-          scoreType = 'Trung bình';
+          scoreType = 'Hạng đạt trung bình - Đã đạt yêu cầu nhưng cần cải thiện thêm.';
         } else if (averageScore >= 7 && averageScore < 8) {
-          scoreType = 'Khá';
+          scoreType = 'Hạng đạt khá - Thành tích tốt, hãy tiếp tục phát huy.';
         } else if (averageScore >= 8 && averageScore <= 10) {
-          scoreType = 'Giỏi';
+          scoreType = 'Hạng đạt giỏi - Xuất sắc! Bạn đã làm rất tốt.';
         }
+
 
         setScoreType(scoreType);
         setModalVisible(true);
@@ -165,36 +166,35 @@ const QuizzCourse = () => {
       {/* Quizz Ask */}
       <View style={styles.viewQuizzAsk}>
         {options.map((option, index) => (
-          <TouchableOpacity
-            onPress={() => handlePress(option.text)}
-            key={`${option.text}-${index}`}
-            style={[
-              styles.innerContainer,
-              {
-                borderColor:
-                  selectedOption === option.text
-                    ? '#000000'
-                    : answerCheck[currentQuestionIndex] !== undefined
-                      ? answerCheck[currentQuestionIndex] && option.isCorrect
-                        ? '#167F71'
-                        : !option.isCorrect && selectedOption === option.text
-                          ? '#EC2222'
-                          : '#e5e5e5'
-                      : 'transparent',
-                borderWidth: 1,
-              },
-            ]}
-          >
-            <Image
-              source={
-                selectedOption === option.text
-                  ? require('../design/image/icon_oval2.png')
-                  : require('../design/image/icon_oval1.png')
-              }
-              style={styles.image}
-            />
-            <Text style={styles.text}>{option.text}</Text>
-          </TouchableOpacity>
+         <TouchableOpacity
+         onPress={() => handlePress(option.text)}
+         key={`${option.text}-${index}`}
+         style={[
+           styles.innerContainer,
+           {
+             borderColor:
+               selectedOption === option.text
+                 ? '#000000' // Border khi câu trả lời được chọn
+                 : answerCheck[currentQuestionIndex] !== undefined
+                 ? !option.isCorrect && selectedOption === option.text
+                   ? '#EC2222' // Border màu đỏ khi câu trả lời sai
+                   : '#e5e5e5' // Border mặc định
+                 : 'transparent', // Không có border khi chưa trả lời
+             borderWidth: 1,
+           },
+         ]}
+       >
+         <Image
+           source={
+             selectedOption === option.text
+               ? require('../design/image/icon_oval2.png')
+               : require('../design/image/icon_oval1.png')
+           }
+           style={styles.image}
+         />
+         <Text style={styles.text}>{option.text}</Text>
+       </TouchableOpacity>
+       
         ))}
 
 

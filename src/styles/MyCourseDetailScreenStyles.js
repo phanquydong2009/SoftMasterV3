@@ -3,6 +3,13 @@ import { StyleSheet } from 'react-native';
 
 
 const styles = StyleSheet.create({
+  
+  completeIcon: {
+    width: 20,
+    height: 20,
+    marginLeft: 10, 
+  },
+  
 //text error
 errorTextContainer: {
   marginTop: 10, 

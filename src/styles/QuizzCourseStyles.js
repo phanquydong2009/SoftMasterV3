@@ -24,10 +24,10 @@ const styles = StyleSheet.create({
     fontWeight: '700',
   },
   modalContainer: {
-    width: 360,
-    height: 490,
+    width: 300,
+    height: 360,
     padding: 20,
-    backgroundColor: '#F5F9FF',
+    backgroundColor: '#FFFFFF',
     borderRadius: 40,
     alignItems: 'center',
     shadowColor: '#000',
@@ -44,8 +44,8 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
   },
   modalImage: {
-    width: 214,
-    height: 192,
+    width: 90,
+    height:90,
     marginBottom: 3,
   },
   modalHeaderText: {
@@ -67,7 +67,7 @@ const styles = StyleSheet.create({
     height: 22,
   },
   modalText: {
-    marginTop: 10,
+  
     color: '#EC2222',
     fontFamily: 'Mulish',
     fontSize: 28,
@@ -197,12 +197,12 @@ const styles = StyleSheet.create({
 
   },
   continueButtonImage: {
-    width: 45,
-    height: 45,
+    width: 30,
+    height: 30,
   },
   continueButtonDone: {
     backgroundColor: '#3D9CE6',
-    padding: 10,
+  padding : 10,
     borderRadius: 20,
     flexDirection: 'row',
     alignItems: 'center',

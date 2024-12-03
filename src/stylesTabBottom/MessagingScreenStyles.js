@@ -42,6 +42,16 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingHorizontal: 5,
   },
+  // txt mess trống 
+  emptyInboxMessage : {
+    textAlign :'center',
+    justifyContent:"center",
+    alignItems :"center",
+    color :'black',
+    fontSize : 15, 
+    fontFamily :"Mulish-Bold",
+    marginVertical  :'50%'
+  },
   body: {
     flex: 1,
     backgroundColor: '#FFFFFF',
