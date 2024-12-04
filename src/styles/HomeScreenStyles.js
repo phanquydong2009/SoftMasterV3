@@ -43,14 +43,12 @@ const styles = StyleSheet.create({
         color: '#545454',
     },
 
-    // viewMentor: {
-    //     marginVertical: 10,
-    // },
     mentors_container: {
         flexDirection: "row",
         justifyContent: "space-between",
         alignItems: 'center',
         paddingRight: 10,
+        marginTop :10
     },
     mentorAvatar: {
         width: 70,
@@ -66,7 +64,7 @@ const styles = StyleSheet.create({
     },
     mentorCard: {
         alignItems: 'center',
-        marginVertical: 15,
+        marginVertical: 10,
         width: 100
     },
     ic_bookmark: {
@@ -96,6 +94,7 @@ const styles = StyleSheet.create({
         shadowOpacity: 0.3,
         shadowRadius: 10,
         elevation: 5,
+    
 
     },
     cardImage: {
@@ -126,13 +125,17 @@ const styles = StyleSheet.create({
     containerText: {
         marginHorizontal: 20
     },
+    // 
+    ListSuject : {
+        marginVertical : 10
+    },
     popularCourses: {
         flexDirection: "row",
         justifyContent: "space-between",
         alignItems: 'center',
         paddingRight: 10,
         marginBottom: 10,
-        marginTop: 30,
+
     },
     title: {
         fontFamily: "Mulish-ExtraBold",
@@ -230,8 +233,8 @@ const styles = StyleSheet.create({
         marginTop: 20,
     },
     searchIcon: {
-        width: 25,
-        height: 25,
+        width: 27,
+        height: 27,
         marginRight: 3,
     },
     textInput: {
@@ -288,15 +291,11 @@ searchContainer: {
         flex: 1,
         justifyContent: 'flex-start',
     },
-    searchIcon: {
-        width: 20,
-        height: 20,
-        marginRight: 10,
-    },
+  
     textInput: {
         color: '#545454',
         fontSize: 16,
-        fontFamily: 'Arial', // Chọn font phù hợp
+        fontFamily: 'Arial', 
     },
 });
 

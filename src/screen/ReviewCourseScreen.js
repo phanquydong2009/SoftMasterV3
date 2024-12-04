@@ -21,6 +21,7 @@ const ReviewCourseScreen = () => {
   const [isModalVisible, setModalVisible] = useState(false);
   const [selectedStars, setSelectedStars] = useState(0);
   const [comment, setComment] = useState('');
+  const [errorMessage, setErrorMessage] = useState('');
 
   useEffect(() => {
     fetchFeedbacks();
@@ -28,40 +29,55 @@ const ReviewCourseScreen = () => {
 
   const fetchFeedbacks = async () => {
     try {
-        const response = await fetch(`${BASE_URL}/feedbackCourse/getFeedbackByCourseID/${courseId}`);
-        const feedbackData = await response.json();
+      const response = await fetch(`${BASE_URL}/feedbackCourse/getFeedbackByCourseID/${courseId}`);
+      const feedbackData = await response.json();
 
-        if (!Array.isArray(feedbackData)) {
-            setReviews([]);
-            return;
-        }
-
-        // Tạo một bộ nhớ cache cho dữ liệu người dùng
-        const userCache = new Map();
-
-        const feedbacksWithUser = await Promise.all(
-            feedbackData.map(async feedback => {
-                // Kiểm tra nếu dữ liệu người dùng đã có trong cache
-                if (userCache.has(feedback.userID)) {
-                    return { ...feedback, userName: userCache.get(feedback.userID).name };
-                }
-
-                // Nếu chưa có trong cache, gọi API để lấy dữ liệu người dùng
-                const userResponse = await fetch(`${BASE_URL}/user/getUserByID/${feedback.userID}`);
-                const userData = await userResponse.json();
-
-                // Lưu vào cache để sử dụng lại lần sau
-                userCache.set(feedback.userID, userData);
-                return { ...feedback, userName: userData.name };
-            })
-        );
-
-        setReviews(feedbacksWithUser);
-    } catch (error) {
-        console.error('Lỗi khi lấy feedbacks:', error);
+      if (!Array.isArray(feedbackData)) {
         setReviews([]);
+        return;
+      }
+
+      // Tạo một bộ nhớ cache cho dữ liệu người dùng
+      const userCache = new Map();
+
+      const feedbacksWithUser = await Promise.all(
+        feedbackData.map(async feedback => {
+
+          // Kiểm tra nếu userID là một đối tượng đã chứa name
+          if (typeof feedback.userID === 'object' && feedback.userID.name) {
+            return { ...feedback, userName: feedback.userID.name };
+          }
+
+          // Kiểm tra nếu dữ liệu người dùng đã có trong cache
+          if (userCache.has(feedback.userID)) {
+
+            return { ...feedback, userName: userCache.get(feedback.userID).name };
+          }
+
+          try {
+            // Nếu chưa có trong cache, gọi API để lấy dữ liệu người dùng
+
+            const userResponse = await fetch(`${BASE_URL}/user/getUserByID/${feedback.userID}`);
+            const userData = await userResponse.json();
+
+            // Lưu vào cache để sử dụng lại lần sau
+            userCache.set(feedback.userID, userData);
+            return { ...feedback, userName: userData.name };
+          } catch (error) {
+
+            return { ...feedback, userName: 'Unknown' }; // Xử lý fallback nếu có lỗi
+          }
+        })
+      );
+
+
+      setReviews(feedbacksWithUser);
+    } catch (error) {
+
+      setReviews([]);
     }
-};
+  };
+
 
   const formatDate = dateString => {
     const date = new Date(dateString);
@@ -79,8 +95,9 @@ const ReviewCourseScreen = () => {
     return (
       <View style={styles.itemReview}>
         <View style={styles.row}>
+        <Text style={styles.txtUser}>{item.userName}</Text>
           <Text style={styles.txtRate}>{stars}</Text>
-          <Text style={styles.txtUser}>{item.userName}</Text>
+        
         </View>
 
         <Text style={styles.txtContent}>{item.feedbackDetail.content}</Text>
@@ -99,42 +116,64 @@ const ReviewCourseScreen = () => {
   const handleStarPress = index => {
     setSelectedStars(index + 1);
   };
-
   const handleSubmitReview = async () => {
-    // Kiểm tra xem userID và courseId có hợp lệ không
     if (!userID || !courseId) {
-        return;
+      return;
     }
 
-    // Tạo URL với userID và courseId
-    const feedbackUrl = `${BASE_URL}/feedbackCourse/feedback/${userID}/${courseId}`;
-    console.log(`Calling API: ${feedbackUrl}`); 
-
+    // Kiểm tra xem người dùng đã tham gia khóa học chưa
+    const enrollmentUrl = `${BASE_URL}/enrollCourse/check-enrollment/${userID}/${courseId}`;
     try {
-        const response = await fetch(feedbackUrl, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                rating: selectedStars , 
-                content: comment , 
-            }),
-        });
+      const enrollmentResponse = await fetch(enrollmentUrl);
 
-        if (response.ok) {
-            console.log('Feedback submitted successfully');
-            setModalVisible(false);
-            setComment('');
-            setSelectedStars(0); 
-            fetchFeedbacks();
-        } else {
-            console.error('Failed to submit feedback', await response.text());
-        }
+      if (!enrollmentResponse.ok) {
+        setErrorMessage('Không thể kiểm tra thông tin tham gia khóa học.');
+        return;
+      }
+
+      const enrollmentData = await enrollmentResponse.json();
+
+      if (!enrollmentData.enrolled) {
+        setErrorMessage('Bạn chưa tham gia khóa học này.');
+        return;
+      }
     } catch (error) {
-        console.error('Error submitting feedback:', error); 
+      console.error('Lỗi khi kiểm tra tham gia khóa học:', error);
+      setErrorMessage('Không thể kết nối đến máy chủ để kiểm tra tham gia khóa học.');
+      return;
     }
-};
+
+    // Nếu đã tham gia khóa học, tiếp tục gửi feedback
+    const feedbackUrl = `${BASE_URL}/feedbackCourse/feedback/${userID}/${courseId}`;
+    try {
+      const response = await fetch(feedbackUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          rating: selectedStars,
+          content: comment,
+        }),
+      });
+
+      if (response.ok) {
+        setModalVisible(false);
+        setComment('');
+        setSelectedStars(0);
+        setErrorMessage('');
+        fetchFeedbacks();
+      } else {
+        const errorData = await response.json();
+        setErrorMessage(errorData.message || 'Đã xảy ra lỗi khi gửi đánh giá.');
+      }
+    } catch (error) {
+      console.error('Error submitting feedback:', error);
+      setErrorMessage('Không thể kết nối đến máy chủ.');
+    }
+  };
+
+
 
   return (
     <View style={styles.container}>
@@ -156,6 +195,7 @@ const ReviewCourseScreen = () => {
         keyExtractor={item => item._id}
         renderItem={renderItem}
       />
+      <Text style={styles.errorTxt}>{errorMessage}</Text>
 
       <View style={styles.ViewAll}>
         <TouchableOpacity style={styles.btnViewAllReview} onPress={() => setModalVisible(true)}>

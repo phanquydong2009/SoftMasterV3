@@ -24,16 +24,14 @@ const styles = StyleSheet.create({
   imgContainer: {
     alignItems: 'center',
     justifyContent: 'center',
-
-
   },
   img: {
-    width: 140,
-    height: 140,
+    width: 200,
+    height:200,
   },
-  // form: {
-  //   marginTop: 20,
-  // },
+  form : {
+    marginTop : -50
+  },
   label: {
     fontFamily: 'Mulish-ExtraBold',
     color: '14',
@@ -88,7 +86,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     height: 50,
     borderRadius: 10,
-    marginTop: 20,
+    marginTop: 80,
   },
   txtLogin: {
     fontSize: 17,

@@ -37,7 +37,7 @@ const styles = StyleSheet.create({
     detailItem: {
         flexDirection: 'row',
         alignItems: 'center',
-        marginBottom: 20,
+        marginBottom:10,
         borderBottomWidth: 1,
         borderBottomColor: '#E8E8E8',
         borderRadius: 8,

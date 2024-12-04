@@ -35,6 +35,7 @@ import VNPayPaymentScreen from '../screen/VNPayPaymentScreen';
 import ReviewCourseScreen from '../screen/ReviewCourseScreen';
 import DetailLesson from '../screen/DetailLesson';
 import BoxChat from '../screen/BoxChat';
+
 const Stack = createStackNavigator();
 
 const AppNavigator = () => {
@@ -119,6 +120,7 @@ const AppNavigator = () => {
         <Stack.Screen name="ReviewCourse" component={ReviewCourseScreen} />
         <Stack.Screen name="DetailLesson" component={DetailLesson} />
         <Stack.Screen name="BoxChat" component={BoxChat} />
+    
       </Stack.Navigator>
     </NavigationContainer>
   );

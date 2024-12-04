@@ -16,7 +16,6 @@ const DetailScreen = () => {
   const navigation = useNavigation();
   const route = useRoute();
   const { courseId, userID } = route.params;
-  console.log('nhận CourseId:', courseId);
   const [courseData, setCourseData] = useState(null);
   const [averageRating, setAverageRating] = useState(0);
   const [countEnrolledUsers, setCountEnrolledUsers] = useState(0);

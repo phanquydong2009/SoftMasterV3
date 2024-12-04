@@ -10,7 +10,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent :'flex-start',
-    marginVertical: 10,
+   
   },
   viewTextHeader: {
     marginLeft: 15,

@@ -42,14 +42,14 @@ const CertificationScreen = () => {
 
   useEffect(() => {
     if (userID) {
-      fetchCertificates(); // Gọi hàm fetchCertificates khi có userID
+      fetchCertificates(); 
     }
   }, [userID]);
 
   // Hàm làm mới dữ liệu khi kéo xuống
   const onRefresh = async () => {
     setRefreshing(true);
-    await fetchCertificates();  // Gọi lại hàm fetchCertificates
+    await fetchCertificates();  
     setRefreshing(false);
   };
 
@@ -90,13 +90,13 @@ const CertificationScreen = () => {
   const renderItem = ({ item }) => (
     <PersonalBrandingCard
       name={item.courseID?.name}
-      sub={item.updatedAt.split('T')[0]}  // Chỉ lấy ngày từ updatedAt
+      sub={item.updatedAt.split('T')[0]}  
       image={item.courseID?.img}
       courseName={item.courseID?.name} 
       teacherID={item.courseID?.teacherID}  
       updatedAt={item.updatedAt}  
       userName={item.userID?.name}    
-      certificateID={item._id}  // Truyền _id chứng chỉ vào đây
+      certificateID={item._id} 
     />
   );
 
@@ -113,18 +113,24 @@ const CertificationScreen = () => {
   return (
     <SafeAreaView style={styles.container}>
       <ToolBar title={'Chứng chỉ'} />
-      <FlatList
+   <View style= {styles.body}>
+   <Text style={styles.emptyText}>Bạn chưa có chứng chỉ nào</Text>
+   <FlatList
         data={certificates}
-        renderItem={renderItem}  // Hiển thị mỗi chứng chỉ
-        keyExtractor={(item) => item._id}  // Dùng _id làm key cho mỗi item
-        showsVerticalScrollIndicator={false}  // Tắt thanh cuộn dọc
+        renderItem={renderItem} 
+        keyExtractor={(item) => item._id}  
+        showsVerticalScrollIndicator={false}  
         refreshControl={
           <RefreshControl
             refreshing={refreshing}
-            onRefresh={onRefresh}  // Gọi hàm onRefresh khi kéo xuống
+            onRefresh={onRefresh}  
           />
         }
+
       />
+    
+   </View>
+
     </SafeAreaView>
   );
 };

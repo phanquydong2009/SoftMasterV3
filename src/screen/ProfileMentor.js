@@ -28,7 +28,7 @@ const ProfileMentor = () => {
   const [courseCount, setCourseCount] = useState(0);
   const [noCoursesMessage, setNoCoursesMessage] = useState("");
   const [isFollowing, setIsFollowing] = useState(false);
- console.log("dữ liệu nhận : ",  _id, userID )
+//  console.log("dữ liệu nhận : ",  _id, userID )
   useEffect(() => {
     // Load follow status from AsyncStorage when screen loads
     const loadFollowStatus = async () => {

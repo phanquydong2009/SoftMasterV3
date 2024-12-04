@@ -74,7 +74,7 @@ const SplashScreen = () => {
 
   return (
     <View style={styles.container}>
-      <Animated.Image source={require('../design/image/robot1.png')} style={[styles.logo, animatedLogoStyle]} />
+      <Animated.Image source={require('../design/image/logoApp.png')} style={[styles.logo, animatedLogoStyle]} />
       <Animated.Text style={[styles.txtname, animatedTxtNameStyle]}>SoftMaster</Animated.Text>
       <Animated.Text style={[styles.txttitle, animatedTxtTitleStyle]}>Kỹ Năng Mềm Toàn Diện</Animated.Text>
     </View>

@@ -1,6 +1,52 @@
-import { StyleSheet } from 'react-native'; 
+import { StyleSheet } from 'react-native';
 
 const styles = StyleSheet.create({
+
+    historyContainer: {
+      width : '100%',
+      height : 500
+    },
+
+    historyItemContainer: {
+        flexDirection: 'row',
+        paddingVertical: 10,
+        paddingHorizontal: 10,
+        alignItems: 'center',
+
+    },
+
+    historyItemTextContainer: {
+        flex: 1, 
+    },
+
+    historyItemText: {
+        fontSize: 16,
+        color: '#333',
+    },
+
+    deleteButton: {
+        padding: 5,
+        marginLeft: 10, // Space between text and delete button
+    },
+
+    deleteIcon: {
+        width: 20,
+        height: 20,
+        tintColor: '#ff6347', // Red color for delete icon
+    },
+
+    clearHistoryButton: {
+        padding: 10,
+        marginTop: 10,
+        backgroundColor: '#ff6347', // Red background color
+        borderRadius: 5,
+        alignItems: 'center',
+    },
+
+    clearHistoryText: {
+        color: '#fff',
+        fontSize: 14,
+    },
 
     noResultsText: {
         textAlign: 'center',
@@ -45,7 +91,7 @@ const styles = StyleSheet.create({
     },
     searchIcon: {
         width: 30,
-        height: 30 ,
+        height: 30,
         marginLeft: 10,
     },
     textInput: {
@@ -80,7 +126,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'space-between',
         marginHorizontal: 10,
-       
+
     },
     itemName: {
         fontFamily: 'Mulish-Bold',

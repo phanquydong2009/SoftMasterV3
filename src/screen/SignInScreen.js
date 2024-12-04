@@ -19,6 +19,9 @@ const SignInScreen = () => {
     const [passwordBorderColor, setPasswordBorderColor] = useState('#CCCCCC');
     const [errorText, setErrorText] = useState('');
 
+    //  link console
+    // https://console.cloud.google.com/apis/credentials?project=softmasterv2-442304
+    // mail tạo console (dongpqps27563@fpt.edu.vn)
 
     // Configure Google Sign-In
     GoogleSignin.configure({
@@ -46,7 +49,7 @@ const SignInScreen = () => {
             }
 
             // Lấy thông tin người dùng từ Google
-            const { id, email, name, photo } = userInfo.data.user; // Sửa chỗ này
+            const { id, email, name, photo } = userInfo.data.user;
             console.log(`Google User: ${name}, Email: ${email}`);
 
             // Gửi dữ liệu tới API backend (nếu cần)
@@ -97,8 +100,6 @@ const SignInScreen = () => {
                 screen: 'Trang chủ',
                 params: { userID: _id, name: userName },
             });
-            // Log dữ liệu _id và name để kiểm tra
-            console.log('User ID :', _id, 'User Name truyền đi là :', userName);
 
         } catch (error) {
             console.error('Google login error:', error.message || error);
@@ -161,12 +162,11 @@ const SignInScreen = () => {
         try {
             const response = await fetch(`${BASE_URL}/user/getAll`);
             const users = await response.json();
-            console.log('Users from API:', users);
 
             const user = users.find(user => user.email === email);
 
             if (user) {
-                console.log('User found:', user);
+
 
                 // Nếu tìm thấy email, gọi API login
                 const loginResponse = await fetch(`${BASE_URL}/user/login`, {
@@ -181,7 +181,7 @@ const SignInScreen = () => {
                 });
 
                 const loginData = await loginResponse.json();
-                console.log('Login response:', loginData);
+
 
                 if (loginResponse.ok) {
                     await AsyncStorage.setItem('USER_INFO', JSON.stringify(user));
@@ -220,7 +220,7 @@ const SignInScreen = () => {
                     <Text style={styles.txtHeader}>Đăng nhập</Text>
                 </View>
                 <View style={styles.imgContainer}>
-                    <Image source={require('../design/image/robot1.png')} style={styles.img} />
+                    <Image source={require('../design/image/logoApp.png')} style={styles.img} />
                 </View>
                 <View style={styles.form}>
                     <Text style={styles.label}>Địa chỉ Email</Text>
@@ -280,12 +280,12 @@ const SignInScreen = () => {
                 <View style={styles.socialButtonsContainer}>
                     <TouchableOpacity style={styles.googleButton} onPress={handleLoginWithGoogle}>
                         <Image source={require('../design/image/ic_google.png')} style={styles.socialIcon} />
-                        <Text style={styles.socialTextGG}>GOOGLE</Text>
+                        <Text style={styles.socialTextGG}>Đăng nhập với Google</Text>
                     </TouchableOpacity>
-                    <TouchableOpacity style={styles.facebookButton}>
+                    {/* <TouchableOpacity style={styles.facebookButton}>
                         <Image source={require('../design/image/ic_facebook.png')} style={styles.socialIcon} />
                         <Text style={styles.socialTextFB}>FACEBOOK</Text>
-                    </TouchableOpacity>
+                    </TouchableOpacity> */}
                 </View>
             </ScrollView>
         </KeyboardAvoidingView>

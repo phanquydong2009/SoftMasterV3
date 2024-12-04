@@ -128,17 +128,20 @@ const styles = StyleSheet.create({
     socialButtonsContainer: {
         flexDirection: 'row',
         justifyContent: 'space-around',
-        marginVertical: 20,
+        marginVertical: 10,
+        
     },
     googleButton: {
         flexDirection: 'row',
         alignItems: 'center',
-        backgroundColor: '#4285F4',
-        borderRadius: 10,
+        backgroundColor: '#FFFFFF',
+        borderRadius:10,
         padding: 10,
         flex: 1,
         marginHorizontal: 5,
         justifyContent: 'center',
+        borderWidth: 1,
+        borderColor: 'black'
     },
     facebookButton: {
         flexDirection: 'row',
@@ -156,7 +159,7 @@ const styles = StyleSheet.create({
         marginRight: 10,
     },
     socialTextGG: {
-        color: '#FFFFFF',
+        color: 'black',
         fontFamily: 'Mulish-Bold',
         fontSize: 16,
     },

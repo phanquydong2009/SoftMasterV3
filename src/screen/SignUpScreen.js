@@ -143,7 +143,7 @@ const SignUpScreen = () => {
         </View>
 
         <View style={styles.imgContainer}>
-          <Image source={require('../design/image/robot1.png')} style={styles.img} />
+          <Image source={require('../design/image/logoApp.png')} style={styles.img} />
         </View>
 
         <View style={styles.form}>
