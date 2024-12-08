@@ -19,7 +19,7 @@ import TermsPolicy from '../screen/TermsPolicy';
 import SecurityScreen from '../screen/SecurityScreen';
 import ShareFriend from '../screen/ShareFriend';
 import LanguageScreen from '../screen/LanguageScreen';
-import Notifications from '../screen/Notifications';
+import Notifications from '../screen/SettingNotifications';
 import CertScreen from '../screen/CertScreen';
 import MyCourseDetail from '../screen/MyCourseDetail';
 import UpgradePremium from '../screen/UpgradePremium';
@@ -35,7 +35,7 @@ import VNPayPaymentScreen from '../screen/VNPayPaymentScreen';
 import ReviewCourseScreen from '../screen/ReviewCourseScreen';
 import DetailLesson from '../screen/DetailLesson';
 import BoxChat from '../screen/BoxChat';
-
+import NotificationScreen from '../screen/NotificationScreen';
 const Stack = createStackNavigator();
 
 const AppNavigator = () => {
@@ -120,7 +120,7 @@ const AppNavigator = () => {
         <Stack.Screen name="ReviewCourse" component={ReviewCourseScreen} />
         <Stack.Screen name="DetailLesson" component={DetailLesson} />
         <Stack.Screen name="BoxChat" component={BoxChat} />
-    
+        <Stack.Screen name="NotificationScreen" component={NotificationScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );

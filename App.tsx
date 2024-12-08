@@ -6,9 +6,8 @@ import AppNavigator from './src/component/AppNavigator';
 function App(): React.JSX.Element {
   return (
     <SafeAreaView style={styles.container}>
-      <AppNavigator />
- 
- 
+       <AppNavigator />
+
     </SafeAreaView>
   );
 }

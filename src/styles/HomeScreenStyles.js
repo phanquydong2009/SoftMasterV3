@@ -180,25 +180,7 @@ const styles = StyleSheet.create({
         flexDirection: "column",
         flex: 3,
     },
-    header2: {
-        flexDirection: "column",
-        flex: 1,
-        marginHorizontal: 20,
-        alignItems: "flex-end",
-    },
-    btn_noti: {
-        width: 40,
-        height: 40,
-        borderRadius: 40,
-        borderWidth: 2,
-        borderColor: '#167F71',
-        justifyContent: "center",
-        alignItems: "center",
-    },
-    img_btn_noti: {
-        width: 30,
-        height: 30,
-    },
+    
     welcome_container: {
         flexDirection: "row",
     },

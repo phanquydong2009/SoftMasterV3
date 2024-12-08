@@ -102,7 +102,7 @@ const SignInScreen = () => {
             });
 
         } catch (error) {
-            console.error('Google login error:', error.message || error);
+        
             setErrorText(error.message || 'Có lỗi xảy ra, vui lòng thử lại.');
         }
     };

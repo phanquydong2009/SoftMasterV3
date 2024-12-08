@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Image } from 'react-native';
-import styles from '../styles/NotificationsStyles';
+import styles from '../styles/SettingNotificationsStyles';
 
 const Notifications = ({ navigation }) => {
     // State for each toggle

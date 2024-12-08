@@ -6,7 +6,7 @@ import {
   View,
   TextInput,
   TouchableOpacity,
-  RefreshControl, // Import RefreshControl
+  RefreshControl,
 } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import moment from 'moment';
