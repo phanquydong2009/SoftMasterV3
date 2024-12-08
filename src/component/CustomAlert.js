@@ -44,9 +44,9 @@ const CustomAlert = ({ visible, score, scoreType, userID, testId }) => {
     }
   }, [visible]);
 
-  // Function to handle navigation to DetailLesson
+  // navigation to DetailLesson
   const handleGoBackToDetailLesson = () => {
-    navigation.goBack(); // Navigates to the previous screen (DetailLesson)
+    navigation.goBack(); 
   };
 
   return (
@@ -69,7 +69,7 @@ const CustomAlert = ({ visible, score, scoreType, userID, testId }) => {
           <Text style={styles.modalFooterText}>{scoreType}</Text>
 
           <TouchableOpacity
-            onPress={handleGoBackToDetailLesson} // Use new function to navigate back
+            onPress={handleGoBackToDetailLesson}
             style={styles.continueButtonDone}>
             <Text style={styles.continueButtonTextDone}>Tiếp theo</Text>
             <Image

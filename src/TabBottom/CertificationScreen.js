@@ -113,24 +113,24 @@ const CertificationScreen = () => {
   return (
     <SafeAreaView style={styles.container}>
       <ToolBar title={'Chứng chỉ'} />
-   <View style= {styles.body}>
-   <Text style={styles.emptyText}>Bạn chưa có chứng chỉ nào</Text>
-   <FlatList
-        data={certificates}
-        renderItem={renderItem} 
-        keyExtractor={(item) => item._id}  
-        showsVerticalScrollIndicator={false}  
-        refreshControl={
-          <RefreshControl
-            refreshing={refreshing}
-            onRefresh={onRefresh}  
+      <View style={styles.body}>
+        {certificates.length === 0 ? (
+          <Text style={styles.emptyText}>Bạn chưa có chứng chỉ nào</Text>
+        ) : (
+          <FlatList
+            data={certificates}
+            renderItem={renderItem} 
+            keyExtractor={(item) => item._id}  
+            showsVerticalScrollIndicator={false}  
+            refreshControl={
+              <RefreshControl
+                refreshing={refreshing}
+                onRefresh={onRefresh}  
+              />
+            }
           />
-        }
-
-      />
-    
-   </View>
-
+        )}
+      </View>
     </SafeAreaView>
   );
 };

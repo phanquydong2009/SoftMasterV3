@@ -122,3 +122,4 @@ const BodyCert = ({ certificateID, userName, nameCourse, teacherName, updatedAt 
 };
 
 export default CertScreen;
+ 

@@ -25,7 +25,7 @@ const styles = StyleSheet.create({
   },
   modalContainer: {
     width: 300,
-    height: 360,
+    height: 370,
     padding: 20,
     backgroundColor: '#FFFFFF',
     borderRadius: 40,
@@ -197,8 +197,8 @@ const styles = StyleSheet.create({
 
   },
   continueButtonImage: {
-    width: 30,
-    height: 30,
+    width: 40,
+    height:40,
   },
   continueButtonDone: {
     backgroundColor: '#3D9CE6',

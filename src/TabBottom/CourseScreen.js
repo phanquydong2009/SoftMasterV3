@@ -31,9 +31,9 @@ const CourseScreen = ({ route }) => {
       const completedCourseIds = certificates.map(
         (certificate) => certificate.courseID._id
       );
-      setCourseIdDone(completedCourseIds); 
+      setCourseIdDone(completedCourseIds);
     } catch (error) {
-     
+
     }
   }, [userID]);
 
@@ -118,8 +118,8 @@ const CourseScreen = ({ route }) => {
     const progressStatus = item.isCompleted
       ? 'Hoàn thành'
       : item.status === 'đang thực hiện'
-      ? 'Chưa hoàn thành'
-      : item.progress;
+        ? 'Chưa hoàn thành'
+        : item.progress;
 
     return (
       <Wrapper
@@ -206,22 +206,6 @@ const CourseScreen = ({ route }) => {
         <TouchableOpacity
           style={[
             styles.button,
-            { backgroundColor: selected === 1 ? '#167F71' : '#E8F1FF' },
-          ]}
-          onPress={() => handlePress(1)}
-        >
-          <Text
-            style={[
-              styles.buttonText,
-              { color: selected === 1 ? '#FFF' : '#202244' },
-            ]}
-          >
-            Hoàn thành
-          </Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={[
-            styles.button,
             { backgroundColor: selected === 2 ? '#167F71' : '#E8F1FF' },
           ]}
           onPress={() => handlePress(2)}
@@ -235,7 +219,24 @@ const CourseScreen = ({ route }) => {
             Đang thực hiện
           </Text>
         </TouchableOpacity>
+        <TouchableOpacity
+          style={[
+            styles.button,
+            { backgroundColor: selected === 1 ? '#167F71' : '#E8F1FF' },
+          ]}
+          onPress={() => handlePress(1)}
+        >
+          <Text
+            style={[
+              styles.buttonText,
+              { color: selected === 1 ? '#FFF' : '#202244' },
+            ]}
+          >
+            Hoàn thành
+          </Text>
+        </TouchableOpacity>
       </View>
+
       <View style={styles.flatListContainer}>
         <FlatList
           data={selected === 1 ? completedCourses : inProgressCourses}

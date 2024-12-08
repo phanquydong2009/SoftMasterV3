@@ -4,13 +4,14 @@ import {
   TouchableOpacity,
   Image,
   ScrollView,
-  Alert,
+  Modal,
   ActivityIndicator,
 } from 'react-native';
 import React, { useCallback, useEffect, useState } from 'react';
 import { useIsFocused, useNavigation, useRoute } from '@react-navigation/native';
 import BASE_URL from '../component/apiConfig';
 import styles from '../styles/DetailScreenStyles';
+import Toast from 'react-native-toast-message';
 
 const DetailScreen = () => {
   const navigation = useNavigation();
@@ -22,6 +23,22 @@ const DetailScreen = () => {
   const [countFeedback, setCountFeedback] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isError, setIsError] = useState(false);
+
+  const [modalVisible, setModalVisible] = useState(false);
+  const [modalMessage, setModalMessage] = useState("");
+  // show toast
+  const showToast = (message) => {
+    Toast.show({
+      type: 'success',
+      position: 'top',
+      text1: message,
+      visibilityTime: 3000, // Duration for the toast to be visible
+      autoHide: true,
+      topOffset: 50, // Adjust this to move the toast further down or up
+    });
+  };
+
+
 
   const handleNavigateToReview = () => {
     navigation.navigate('ReviewCourse', { courseId, userID });
@@ -49,13 +66,13 @@ const DetailScreen = () => {
     } catch (error) {
       console.error('Lỗi khi lấy thông tin chi tiết khóa học:', error);
       setIsError(true);
-
     } finally {
       setIsLoading(false);
     }
   }, [courseId, userID]);
 
-  const isFocused = useIsFocused();  const fetchEnrolledUsersCount = useCallback(async () => {
+  const isFocused = useIsFocused();
+  const fetchEnrolledUsersCount = useCallback(async () => {
     try {
       const response = await fetch(
         `${BASE_URL}/enrollCourse/countEnrolledUsers/${courseId}`
@@ -68,17 +85,14 @@ const DetailScreen = () => {
       const data = await response.json();
       setCountEnrolledUsers(data.count);
     } catch (error) {
-
       setCountEnrolledUsers(0);
     }
   }, [courseId]);
 
-
   useEffect(() => {
     fetchCourseDetail();
-    fetchEnrolledUsersCount(); 
+    fetchEnrolledUsersCount();
   }, [isFocused, fetchCourseDetail, fetchEnrolledUsersCount]);
-
 
   useEffect(() => {
     fetchCourseDetail();
@@ -107,7 +121,6 @@ const DetailScreen = () => {
         const feedbackData = await feedbackResponse.json();
         setCountFeedback(feedbackData.count);
       } catch (error) {
-
         setAverageRating(0);
         setCountFeedback(0);
       }
@@ -116,51 +129,46 @@ const DetailScreen = () => {
     fetchCourseDetails();
   }, [courseId]);
 
-  // tạo link thanh tóan
-  const createPaymentUrl = async () => {
-    try {
-      const res = await fetch(
-        `${BASE_URL}/payment/create-payment-url`,
-        {
-          method: 'POST',
-          body: JSON.stringify({
-            userID: userID,
-            courseId,
-          }),
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        }
-      );
+ // tạo link thanh toán
+const createPaymentUrl = async () => {
+  try {
+    const res = await fetch(
+      `${BASE_URL}/payment/create-payment-url`,
+      {
+        method: 'POST',
+        body: JSON.stringify({
+          userID: userID,
+          courseId,
+        }),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      }
+    );
 
-      const data = await res.json();
-      console.log('Dữ liệu trả về từ API thanh toán:', data);
-      // Kiểm tra nếu có URL thanh toán trong dữ liệu trả về
-      if (data && data.paymentUrl) {
-        console.log('URL thanh toán:', data.paymentUrl);
-        return data.paymentUrl;
-      }
-      // Nếu API trả về trực tiếp URL thay vì trong paymentUrl, kiểm tra trực tiếp
-      else if (typeof data === 'string' && data.startsWith('http')) {
-        console.log('URL thanh toán:', data);
-        return data;
-      }
-      else {
-        console.log('Lỗi', 'Không có URL thanh toán');
-        return null;
-      }
-    } catch (error) {
+    const data = await res.json();
+    console.log('Dữ liệu trả về từ API thanh toán:', data);
 
+    if (data && data.paymentUrl) {
+      console.log('URL thanh toán:', data.paymentUrl); // Log URL thanh toán
+      return data.paymentUrl;
+    } else if (typeof data === 'string' && data.startsWith('http')) {
+      console.log('URL thanh toán:', data); // Log URL thanh toán nếu trả về là string
+      return data;
+    } else {
+      console.log('Lỗi', 'Không có URL thanh toán');
       return null;
     }
-  };
+  } catch (error) {
+    console.log('Lỗi khi tạo link thanh toán:', error);
+    return null;
+  }
+};
 
 
   // kiểm tra user đã tham gia khóa học chưa 
   const onJoinCoursePress = async () => {
     try {
-      // Kiểm tra xem người dùng đã tham gia khóa học chưa
-      console.log('Đang kiểm tra trạng thái tham gia khóa học...');
       const checkEnrollmentResponse = await fetch(
         `${BASE_URL}/enrollCourse/check-enrollment/${userID}/${courseId}`
       );
@@ -170,37 +178,21 @@ const DetailScreen = () => {
       }
   
       const enrollmentData = await checkEnrollmentResponse.json();
-      console.log('Dữ liệu trạng thái tham gia:', enrollmentData);
   
-      // Nếu đã tham gia khóa học
       if (enrollmentData.enrolled) {
-        Alert.alert(
-          'Thông báo',
-          'Bạn đã tham gia khóa học này rồi!',
-          [
-            {
-              text: 'Quay lại khóa học của tôi',
-              onPress: () => navigation.navigate('Tabs', {
-                screen: 'Khóa học',
-                params: { courseID: courseId, userID: userID }
-              }),
-            },
-            {
-              text: 'OK',
-              style: 'cancel',
-            },
-          ]
-        );
-        return; // Dừng việc tạo link thanh toán và không tiếp tục
+        // Hiển thị toast trước
+        showToast('Bạn đã tham gia khóa học này rồi!');
+        // Delay modal xuất hiện sau khi toast
+        setTimeout(() => {
+          setModalMessage('Bạn đã tham gia khóa học này rồi!');
+          setModalVisible(true); // Show modal
+        }, 1000); // Delay 1s (1000ms)
+        return;
       }
   
-      // Nếu khóa học có giá > 0, tạo URL thanh toán
       if (courseData.price > 0) {
-        console.log('Đang tạo URL thanh toán...');
         const paymentUrl = await createPaymentUrl();
         if (paymentUrl) {
-          console.log('URL thanh toán:', paymentUrl);
-          // Chuyển sang màn thanh toán và truyền thêm courseId và userID
           navigation.navigate('CoursePayment', {
             paymentUrl,
             courseId,
@@ -208,8 +200,6 @@ const DetailScreen = () => {
           });
         }
       } else {
-        // Nếu khóa học miễn phí, thực hiện đăng ký
-        console.log('Đang đăng ký vào khóa học miễn phí...');
         const enrollResponse = await fetch(
           `${BASE_URL}/enrollCourse/enrollCourse/${userID}/${courseId}`,
           {
@@ -225,44 +215,31 @@ const DetailScreen = () => {
         }
   
         const enrollResult = await enrollResponse.json();
-        console.log('Kết quả đăng ký:', enrollResult);
-        Alert.alert(
-          'Thông báo',
-          'Bạn đã tham gia khóa học thành công!',
-          [
-            {
-              text: 'Quay lại khóa học của tôi',
-              onPress: () => navigation.navigate('Tabs', {
-                screen: 'Khóa học',
-                params: { courseID: courseId, userID: userID }
-              }),
-            },
-            {
-              text: 'OK',
-              style: 'cancel',
-            },
-          ]
-        );
+        // Hiển thị toast trước
+        showToast(`Chúc mừng bạn đã tham gia khóa học ${courseData.name} thành công!`);
+        // Delay modal xuất hiện sau khi toast
+        setTimeout(() => {
+          setModalMessage('Bạn đã tham gia khóa học thành công!');
+          setModalVisible(true); // Show modal
+        }, 1000); // Delay 1s (1000ms)
+  
         setCourseData((prevData) => ({
           ...prevData,
           isJoinedCourse: true,
         }));
       }
     } catch (error) {
-      Alert.alert(
-        'Thông báo',
-        'Có lỗi xảy ra khi tham gia khóa học',
-        [
-          {
-            text: 'OK',
-            style: 'cancel',
-          },
-        ]
-      );
+      // Hiển thị toast trước khi hiển thị modal lỗi
+      showToast('Có lỗi xảy ra khi tham gia khóa học');
+      // Delay modal xuất hiện sau khi toast
+      setTimeout(() => {
+        setModalMessage('Có lỗi xảy ra khi tham gia khóa học');
+        setModalVisible(true); // Show modal
+      }, 1000); // Delay 1s (1000ms)
     }
   };
   
-
+  
 
   if (isLoading) {
     return (
@@ -295,6 +272,8 @@ const DetailScreen = () => {
         </TouchableOpacity>
         <Text style={styles.txtHeader}>Thông tin khóa học</Text>
       </View>
+
+      {/* body */}
       <View style={styles.top}>
         <View style={styles.banner}>
           <Image source={{ uri: img }} style={styles.imgBanner} />
@@ -312,12 +291,12 @@ const DetailScreen = () => {
           <Text style={styles.txtInfo}>Giá: {courseData.price.toLocaleString('vi-VN')} VND</Text>
         </View>
         <View style={styles.data_container}>
-        <TouchableOpacity>
-          <View style={styles.column}>
-            <Text style={styles.txt_number}>{countEnrolledUsers} học sinh</Text>
-            <Text style={styles.title}>Đã tham gia</Text>
-          </View>
-        </TouchableOpacity>
+          <TouchableOpacity>
+            <View style={styles.column}>
+              <Text style={styles.txt_number}>{countEnrolledUsers} học sinh</Text>
+              <Text style={styles.title}>Đã tham gia</Text>
+            </View>
+          </TouchableOpacity>
           <View style={styles.column}>
             <Text style={styles.txt_number}>
               {averageRating ? `${parseFloat(averageRating).toFixed(1)} ⭐` : '0 ⭐'}
@@ -342,7 +321,7 @@ const DetailScreen = () => {
           </ScrollView>
         </View>
       </View>
-
+      {/* Buttom */}
       <View style={styles.button}>
         <TouchableOpacity
           style={styles.btn_container}
@@ -353,6 +332,36 @@ const DetailScreen = () => {
           </Text>
         </TouchableOpacity>
       </View>
+      {/* Modal */}
+      <Modal
+        visible={modalVisible}
+        transparent={true}
+        animationType="fade"
+        onRequestClose={() => setModalVisible(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContainer}>
+            <Text style={styles.modalTitle}>Thông báo</Text>
+            <Text style={styles.modalMessage}>{modalMessage}</Text>
+            <View style={styles.btn_containerModel}>
+
+              <TouchableOpacity
+                style={[styles.modalButton, styles.rightButton]}
+                onPress={() => navigation.navigate('Tabs', { screen: 'Khóa học', params: { userID } })}
+              >
+                <Text style={styles.modalButtonText}>Đến khóa học</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={[styles.modalButton, styles.leftButton]}
+                onPress={() => setModalVisible(false)}
+              >
+                <Text style={styles.modalButtonText}>Đóng</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 };
