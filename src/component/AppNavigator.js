@@ -36,6 +36,8 @@ import ReviewCourseScreen from '../screen/ReviewCourseScreen';
 import DetailLesson from '../screen/DetailLesson';
 import BoxChat from '../screen/BoxChat';
 import NotificationScreen from '../screen/NotificationScreen';
+import UpdatePassword from '../screen/UpdatePassword';
+import CertificationScreen from '../TabBottom/CertificationScreen';
 const Stack = createStackNavigator();
 
 const AppNavigator = () => {
@@ -121,6 +123,8 @@ const AppNavigator = () => {
         <Stack.Screen name="DetailLesson" component={DetailLesson} />
         <Stack.Screen name="BoxChat" component={BoxChat} />
         <Stack.Screen name="NotificationScreen" component={NotificationScreen} />
+        <Stack.Screen name="UpdatePassword" component={UpdatePassword} />
+        <Stack.Screen name="CertificationScreen" component={CertificationScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );

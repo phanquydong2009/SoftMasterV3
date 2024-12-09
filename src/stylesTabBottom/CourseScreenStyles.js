@@ -39,8 +39,8 @@ const styles = StyleSheet.create({
     paddingLeft: 10,
   },
   searchIcon: {
-    width: 38,
-    height: 38,
+    width: 30,
+    height: 30,
   },
   viewDonePending: {
     marginTop: 20,

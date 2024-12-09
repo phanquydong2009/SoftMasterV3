@@ -14,13 +14,7 @@ const ForgotPassword = () => {
         navigation.goBack();
     };
 
-    const handleSignIn = () => {
-        navigation.navigate('SignIn');
-    };
-
-    const handleSignUp = () => {
-        navigation.navigate('SignUp');
-    };
+   
 
     const handleOtpVerification = async () => {
         if (!email) {
@@ -79,7 +73,7 @@ const ForgotPassword = () => {
                 <Text style={styles.txtHeader}>Đổi Mật Khẩu</Text>
             </View>
             <View style={styles.imgContainer}>
-                <Image source={require('../design/image/robot1.png')} style={styles.img} />
+                <Image source={require('../design/image/logoAppNoBG.png')} style={styles.img} />
             </View>
             <View style={styles.form}>
                 <Text style={styles.label}>Địa chỉ Email</Text>

@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, StyleSheet, Image, TouchableOpacity, TextInput, Modal } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import BASE_URL from '../component/apiConfig';
+import styles from '../styles/PasswordNewStyles';
 const PasswordNew = () => {
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');

@@ -131,7 +131,7 @@ const SignInScreen = () => {
 
     const handleLogin = async () => {
         let valid = true;
-
+    
         if (email === '') {
             setEmailBorderColor('#FF0000');
             valid = false;
@@ -142,32 +142,31 @@ const SignInScreen = () => {
         } else {
             setEmailBorderColor('#4CAF50');
         }
-
+    
         if (password === '') {
             setPasswordBorderColor('#FF0000');
         } else {
             setPasswordBorderColor('#4CAF50');
         }
-
+    
         if (!valid) {
             if (!errorText) {
                 setErrorText('Vui lòng điền đủ thông tin');
             }
             return;
         }
-
+    
         setErrorText('');
-
+    
         // Gọi API getAll để kiểm tra email
         try {
             const response = await fetch(`${BASE_URL}/user/getAll`);
             const users = await response.json();
-
+    
             const user = users.find(user => user.email === email);
-
+    
             if (user) {
-
-
+    
                 // Nếu tìm thấy email, gọi API login
                 const loginResponse = await fetch(`${BASE_URL}/user/login`, {
                     method: 'POST',
@@ -179,19 +178,35 @@ const SignInScreen = () => {
                         password,
                     }),
                 });
-
+    
                 const loginData = await loginResponse.json();
-
-
+    
                 if (loginResponse.ok) {
                     await AsyncStorage.setItem('USER_INFO', JSON.stringify(user));
-
+    
                     console.log('Navigating to HomeScreen with userID:', user._id, 'and name:', user.name);
-                    navigation.navigate('Tabs', { screen: 'Chứng chỉ', params: { userID: user._id } });
-                    navigation.navigate('Tabs', { screen: 'Nhắn tin', params: { userID: user._id } });
-                    navigation.navigate('Tabs', { screen: 'Cá nhân', params: { userID: user._id } });
-                    navigation.navigate('Tabs', { screen: 'Khóa học', params: { userID: user._id } });
-                    navigation.navigate('Tabs', { screen: 'Trang chủ', params: { userID: user._id, name: user.name } });
+    
+                    // Navigate to different screens with the user data, including currentPassword in the 'Cá nhân' screen
+                    navigation.navigate('Tabs', { 
+                        screen: 'Chứng chỉ', 
+                        params: { userID: user._id } 
+                    });
+                    navigation.navigate('Tabs', { 
+                        screen: 'Nhắn tin', 
+                        params: { userID: user._id } 
+                    });
+                    navigation.navigate('Tabs', { 
+                        screen: 'Cá nhân', 
+                        params: { userID: user._id, currentPassword: password } 
+                    });
+                    navigation.navigate('Tabs', { 
+                        screen: 'Khóa học', 
+                        params: { userID: user._id } 
+                    });
+                    navigation.navigate('Tabs', { 
+                        screen: 'Trang chủ', 
+                        params: { userID: user._id, name: user.name } 
+                    });
                 } else {
                     if (loginData.message === 'Incorrect password') {
                         setErrorText('Mật khẩu không đúng!');
@@ -209,7 +224,8 @@ const SignInScreen = () => {
             console.error('Fetch error:', error);
         }
     };
-
+    
+    
     return (
         <KeyboardAvoidingView style={styles.container} behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
             <ScrollView contentContainerStyle={{ flexGrow: 1 }} showsVerticalScrollIndicator={false}>

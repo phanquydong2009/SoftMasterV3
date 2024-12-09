@@ -65,7 +65,8 @@ const styles = StyleSheet.create({
     mentorCard: {
         alignItems: 'center',
         marginVertical: 10,
-        width: 100
+        width: 100, 
+
     },
     ic_bookmark: {
         width: 30,
@@ -87,8 +88,8 @@ const styles = StyleSheet.create({
         borderRadius: 10,
         overflow: 'hidden',
         marginRight: 10,
-        width: 290,
-        height: 250,
+        width: 250,
+        height:230,
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 10 },
         shadowOpacity: 0.3,
@@ -98,14 +99,15 @@ const styles = StyleSheet.create({
 
     },
     cardImage: {
-        width: 290,
-        height: '60%',
+        width: '100%',
+        height: '50%',
         borderRadius: 10,
+
     },
 
     cardInstructor: {
         fontFamily: 'Mulish-ExtraBold',
-        fontSize: 18,
+        fontSize: 16,
         color: '#202244',
         marginBottom: 5,
 

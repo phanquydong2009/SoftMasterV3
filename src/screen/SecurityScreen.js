@@ -1,21 +1,28 @@
 import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, Image, ImageBackground } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useRoute } from '@react-navigation/native';
 
 import styles from '../styles/SecurityScreenStyles';
 
 const SecurityScreen = () => {
     const navigation = useNavigation();
+    const route = useRoute();
+    const userID = route.params?.userID; // Nhận userID từ tham số
+
     // State for switch
     const [isRememberMeEnabled, setIsRememberMeEnabled] = useState(false);
 
     const toggleSwitch = () => {
         setIsRememberMeEnabled(prev => !prev);
     };
+
     const handleForgotPassword = () => {
-        navigation.navigate('ForgotPassword');
+        navigation.navigate('UpdatePassword', { userID }); // Truyền userID khi điều hướng
     };
-  
+
+    const handleViewInfo = () => {
+        navigation.navigate('EditProfile', { userID }); // Truyền userID khi điều hướng
+    };
     return (
         <View style={styles.container}>
             <View style={styles.header}>
@@ -58,7 +65,7 @@ const SecurityScreen = () => {
                     </TouchableOpacity>
                 </View>
                 {/* Action Buttons */}
-                <TouchableOpacity style={styles.infoButton}>
+                <TouchableOpacity style={styles.infoButton}onPress={handleViewInfo}>
                     <Text style={styles.infoButtonText}>Xem thông tin</Text>
                 </TouchableOpacity>
                 <TouchableOpacity style={styles.passwordButton} onPress={handleForgotPassword} >

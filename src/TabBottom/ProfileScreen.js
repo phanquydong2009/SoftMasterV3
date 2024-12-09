@@ -17,8 +17,9 @@ import styles from '../stylesTabBottom/ProfileScreenStyles';
 const ProfileScreen = () => {
   const navigation = useNavigation();
   const route = useRoute();
-  const userID = route.params?.userID;
-
+  const { userID, currentPassword } = route.params;
+  // console.log('Current Password:', currentPassword);
+ 
   const [userData, setUserData] = useState({
     _id: '',
     name: '',
@@ -55,9 +56,13 @@ const ProfileScreen = () => {
   }, [userID]);
 
   const handleEditProfile = () => {
-    console.log('ID truyền qua là:', userData._id);
-    navigation.navigate('EditProfile', { userID: userData._id });
-  };
+
+    navigation.navigate('EditProfile', { 
+        userID: userData._id, 
+        currentPassword: currentPassword 
+    });
+};
+
 
   const onSignOut = async () => {
     await AsyncStorage.removeItem('USER_INFO');
@@ -73,7 +78,7 @@ const ProfileScreen = () => {
     {
       title: 'Nâng cấp lên Premium',
       icon: require('../design/image/vip.png'),
-      onPress: () => navigation.navigate('Premium'),
+      onPress: () => navigation.navigate('Premium', { userID }),
     },
     {
       title: 'Chỉnh sửa hồ sơ',
@@ -83,29 +88,32 @@ const ProfileScreen = () => {
     {
       title: 'Tùy chọn thanh toán',
       icon: require('../design/image/payment.png'),
-      onPress: () => navigation.navigate('CardPayment'),
+      onPress: () => navigation.navigate('CardPayment', { userID }),
     },
     {
       title: 'Bảo mật',
       icon: require('../design/image/ic_security.png'),
-      onPress: () => navigation.navigate('Security'),
+      onPress: () => navigation.navigate('Security', { userID }),
     },
     {
       title: 'Ngôn ngữ',
       icon: require('../design/image/language.png'),
       value: 'Vietnam(VN)',
-      onPress: () => navigation.navigate('Language'),
+      onPress: () => navigation.navigate('Language', { userID }),
     },
-    { title: 'Chế độ tối', icon: require('../design/image/dark_mode.png') },
+    { 
+      title: 'Chế độ tối', 
+      icon: require('../design/image/dark_mode.png') 
+    },
     {
       title: 'Điều khoản & Điều kiện',
       icon: require('../design/image/terms.png'),
-      onPress: () => navigation.navigate('TermsPolicy'),
+      onPress: () => navigation.navigate('TermsPolicy', { userID }),
     },
     {
       title: 'Mời bạn bè',
       icon: require('../design/image/invite_friends.png'),
-      onPress: () => navigation.navigate('ShareFriend'),
+      onPress: () => navigation.navigate('ShareFriend', { userID }),
     },
     {
       title: 'Đăng xuất',
@@ -113,7 +121,7 @@ const ProfileScreen = () => {
       onPress: onSignOut,
     },
   ];
-
+  
   const ProfileItem = ({ icon, title, value, onPress }) => (
     <TouchableOpacity style={styles.item} onPress={onPress}>
       <View style={styles.itemLeft}>

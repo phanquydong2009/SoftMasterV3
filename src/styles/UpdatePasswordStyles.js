@@ -1,5 +1,47 @@
 import { StyleSheet } from 'react-native';
 const styles = StyleSheet.create({
+    
+    // Style cho popup
+    popupOverlay: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: 'rgba(0, 0, 0, 0.5)', // Màu nền tối mờ
+      },
+      popupContainer: {
+        width: 300,
+        backgroundColor: 'white',
+        borderRadius: 10,
+        padding: 20,
+        alignItems: 'center',
+        elevation: 5, // Đổ bóng
+      },
+      popupImage: {
+        width: 100,
+        height: 100,
+        marginBottom: 10,
+      },
+      popupTitle: {
+        fontSize: 18,
+        fontFamily: 'Mulish-ExtraBold',
+        marginBottom: 5,
+      },
+      popupMessage: {
+        fontSize: 14,
+        fontFamily: 'Mulish-Bold',
+        textAlign: 'center',
+        marginBottom: 15,
+      },
+      popupButton: {
+        backgroundColor: '#007bff',
+        paddingVertical: 10,
+        paddingHorizontal: 20,
+        borderRadius: 5,
+      },
+      popupButtonText: {
+        color: 'white',
+        fontSize: 16,
+      },
     container: {
         flex: 1,
         backgroundColor: '#FFFFFF',

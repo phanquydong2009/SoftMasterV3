@@ -3,8 +3,7 @@ import { StyleSheet } from 'react-native';
 
 const styles = StyleSheet.create({
   button: {
-    marginBottom: 20,
-    marginTop: 50,
+marginVertical :20
   },
   txtBtn: {
     color: '#FFFFFF',
@@ -25,7 +24,7 @@ const styles = StyleSheet.create({
     marginHorizontal: 20,
   },
   describe: {
-    height: 180,
+    height: 200,
     marginHorizontal: 10,
     marginTop: 10,
   },
@@ -34,7 +33,7 @@ const styles = StyleSheet.create({
   },
   txt_describe: {
     color: '#202244',
-    fontFamily: 'Mulish-ExtraBold',
+    fontFamily: 'Mulish',
     fontSize: 16,
     textAlign: 'justify',
   },
@@ -45,7 +44,7 @@ const styles = StyleSheet.create({
   },
   title: {
     color: '#545454',
-    fontFamily: 'Mulish-ExtraBold',
+    fontFamily: 'Mulish',
     fontSize: 17,
   },
   column: {
@@ -57,7 +56,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    margin: 15,
+    marginHorizontal: 15,
   },
   txtInfo: {
     fontSize: 19,

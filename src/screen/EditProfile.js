@@ -1,4 +1,4 @@
-import { Image, Modal, StyleSheet, Text, TextInput, TouchableOpacity, View, Alert, ActivityIndicator, Keyboard } from 'react-native';
+import { Image, Modal, Text, TextInput, TouchableOpacity, View, Alert, ActivityIndicator, Keyboard } from 'react-native';
 import React, { useEffect, useState } from 'react';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { launchImageLibrary } from 'react-native-image-picker';
@@ -11,7 +11,8 @@ import styles from '../styles/EditProfileStyles';
 const EditProfile = () => {
   const navigation = useNavigation();
   const route = useRoute();
-  const { userID } = route.params;
+  const { userID, currentPassword } = route.params; 
+
   const [gender, setGender] = useState('');
   const [modalVisible, setModalVisible] = useState(false);
   const [successPopupVisible, setSuccessPopupVisible] = useState(false);
@@ -100,6 +101,10 @@ const EditProfile = () => {
   const handleGoBack = () => {
     navigation.goBack();
   };
+  const handleGoUpdatePassWord = () => {
+    navigation.navigate('UpdatePassword', { userID ,currentPassword});
+  };
+  
 
   const closeSuccessPopup = () => {
     setSuccessPopupVisible(false);
@@ -246,7 +251,7 @@ const EditProfile = () => {
                 </TouchableOpacity>
               </Modal>
 
-              <TouchableOpacity style={styles.inputContainer}>
+              <TouchableOpacity style={styles.inputContainer}onPress={handleGoUpdatePassWord }>
                 <Image source={require('../design/image/ic_name.png')} style={styles.icon} />
                 <Text style={styles.textInput}>Đổi mật khẩu</Text>
               </TouchableOpacity>

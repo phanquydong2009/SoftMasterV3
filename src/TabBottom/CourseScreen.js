@@ -197,7 +197,7 @@ const CourseScreen = ({ route }) => {
         />
         <TouchableOpacity>
           <Image
-            source={require('../design/image/icon_search.png')}
+            source={require('../design/image/ic_search.png')}
             style={styles.searchIcon}
           />
         </TouchableOpacity>

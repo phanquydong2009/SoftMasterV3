@@ -13,14 +13,6 @@ const DetailLesson = () => {
   const route = useRoute();
   const { _id, userID, courseID } = route.params || {};
 
-
-  // Ghi log để kiểm tra giá trị của _id và userID
-  useEffect(() => {
-    console.log("Nhận được giá trị _id:", _id);
-    console.log("Nhận được giá trị userID:", userID);
-    console.log('courseID:', courseID);
-  }, [route.params]);
-
   const [videoData, setVideoData] = useState([]);
   const [testData, setTestData] = useState([]);
   const [videoLink, setVideoLink] = useState(null);
@@ -31,7 +23,7 @@ const DetailLesson = () => {
   const [errorText, setErrorText] = useState('');
   const [completedTests, setCompletedTests] = useState({});
   const [refreshing, setRefreshing] = useState(false);
-
+  const [retryTestId, setRetryTestId] = useState(null); 
   const timerRef = useRef(null);
 
 
@@ -106,7 +98,7 @@ const DetailLesson = () => {
       setModalVisible(true);
       return;
     }
-
+  
     fetch(`${BASE_URL}/score/scores/canTakeTest/${userID}/${testId}`)
       .then((response) => response.json())
       .then((json) => {
@@ -117,6 +109,11 @@ const DetailLesson = () => {
             ...prevState,
             [testId]: true,
           }));
+          // Nếu người dùng đã đạt 10 điểm, thông báo và không cho phép làm lại
+          setErrorText('Bạn đã đạt 10 điểm. Không thể làm lại bài kiểm tra này.');
+        } else if (json.message === 'Bạn chưa đạt 10 điểm. Bạn cần làm lại bài kiểm tra này trước khi qua bài khác.') {
+          // Nếu chưa đạt 10 điểm, cho phép làm lại bài kiểm tra
+          navigation.navigate('QuizzCourse', { testId, userID });
         } else {
           setErrorText(json.message || 'Có lỗi xảy ra, vui lòng thử lại sau.');
         }
@@ -126,6 +123,7 @@ const DetailLesson = () => {
         setErrorText('Lỗi hệ thống, vui lòng thử lại sau.');
       });
   };
+  
 
   const renderTestItem = ({ item, index }) => {
     const updatedAt = item.updatedAt.split('T')[0];
@@ -200,12 +198,6 @@ const DetailLesson = () => {
 
       // Gán _id thành courseID 
       const testIdDone = _id;
-     
-
-      // Log giá trị truyền đi
-      console.log(`Thông tin truyền đi: testIdDone = ${testIdDone}, userID = ${userID}, courseID = ${courseID}`);
-
-      // Điều hướng đến MyCourseDetail với courseID và userID
       navigation.navigate('MyCourseDetail', { testIdDone, userID ,courseID});
     }
   };
@@ -219,12 +211,7 @@ const DetailLesson = () => {
         <Text style={styles.headerTitle}>Video & Bài Quizz</Text>
       </View>
 
-      {/* <View style={styles.searchContainer}>
-        <TextInput style={styles.input} placeholder="Tìm kiếm..." />
-        <TouchableOpacity>
-          <Image source={require('../design/image/ic_search.png')} style={styles.searchIcon} />
-        </TouchableOpacity>
-      </View> */}
+  
 
       {isPlaying && videoLink ? (
         <View style={{ flex: 1 }}>

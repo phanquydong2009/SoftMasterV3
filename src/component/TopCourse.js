@@ -66,7 +66,7 @@ const TopCourse = ({ userID }) => {
                 </Text>
 
                 {/* Hiển thị mô tả khóa học */}
-                <Text numberOfLines={2} ellipsizeMode="tail" style={styles.describe}>
+                <Text numberOfLines={4} ellipsizeMode="tail" style={styles.describe}>
                     {item.describe}
                 </Text>
             </View>
