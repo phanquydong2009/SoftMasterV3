@@ -56,23 +56,28 @@ const ForwardedViewShot = React.forwardRef((props, ref) => (
 const ButtonDownload = ({ certViewRef }) => {
   const handleDownload = async () => {
     try {
-      // Chụp ảnh toàn bộ BodyCert
-      const uri = await certViewRef.current.capture(); // capture() sẽ chụp ảnh giao diện
-      const downloadDest = `${RNFS.ExternalDirectoryPath}/certificate.jpg`; // Đường dẫn lưu ảnh vào bộ nhớ
+      // Kiểm tra nếu ref tồn tại trước khi gọi capture
+      if (certViewRef?.current) {
+        // Chụp ảnh toàn bộ BodyCert
+        const uri = await certViewRef.current.capture(); // capture() sẽ chụp ảnh giao diện
+        const downloadDest = `${RNFS.ExternalDirectoryPath}/certificate.jpg`; // Đường dẫn lưu ảnh vào bộ nhớ
 
-      // Di chuyển ảnh vừa chụp đến thư mục tải về
-      await RNFS.moveFile(uri, downloadDest);
+        // Di chuyển ảnh vừa chụp đến thư mục tải về
+        await RNFS.moveFile(uri, downloadDest);
 
-      // Hiển thị thông báo thành công
-      Toast.show({
-        type: 'success',
-        position: 'bottom',
-        text1: 'Thành công',
-        text2: 'Chứng chỉ đã được tải xuống!',
-        visibilityTime: 3000,
-        autoHide: true,
-        topOffset: 30,
-      });
+        // Hiển thị thông báo thành công
+        Toast.show({
+          type: 'success',
+          position: 'bottom',
+          text1: 'Thành công',
+          text2: 'Chứng chỉ đã được tải xuống!',
+          visibilityTime: 3000,
+          autoHide: true,
+          topOffset: 30,
+        });
+      } else {
+        throw new Error("Không tìm thấy ref của ViewShot.");
+      }
     } catch (error) {
       console.error('Lỗi khi tải chứng chỉ:', error);
       // Hiển thị thông báo lỗi
@@ -98,6 +103,7 @@ const ButtonDownload = ({ certViewRef }) => {
     </TouchableOpacity>
   );
 };
+
 
 const BodyCert = ({ certificateID, userName, nameCourse, teacherName, updatedAt }) => {
   return (
