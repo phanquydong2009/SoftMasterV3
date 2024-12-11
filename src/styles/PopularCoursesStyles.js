@@ -24,6 +24,14 @@ const styles = StyleSheet.create({
         fontFamily: "Mulish-Bold",
         fontSize: 15,
     },
+    //
+    emptyMessage: {
+        textAlign: 'center',
+        color: '#999',
+        fontSize: 16,
+        marginTop: 20,
+    },
+    
     detailsWrapper: {
         marginTop: 10,
         marginBottom: 50
@@ -31,8 +39,6 @@ const styles = StyleSheet.create({
     },
     detailsContainer: {
         paddingVertical: 10,
-
-
     },
     detailItem: {
         flexDirection: 'row',

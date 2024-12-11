@@ -63,7 +63,7 @@ const FollowTeacherCourse = ({ userID }) => {
                 </View>
             </View>
 
-            <Text style={styles.followItemDescription} numberOfLines={1} ellipsizeMode="tail">
+            <Text style={styles.followItemDescription} numberOfLines={3} ellipsizeMode="tail">
                 {item.describe}
             </Text>
         </View>
@@ -119,11 +119,12 @@ const styles = StyleSheet.create({
     },
     followItemContainer: {
         width: 250,
+        height : 150,
         marginRight: 15,
-        marginVertical: 20,
+        marginVertical: 10,
         backgroundColor: '#FFFFFF',
         borderRadius: 20,
-        padding: 10,
+        padding: 5,
     },
     row1: {
         flexDirection: 'row',

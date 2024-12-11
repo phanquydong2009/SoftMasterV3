@@ -2,9 +2,9 @@ import { StyleSheet } from 'react-native';
 
 
 const styles = StyleSheet.create({
-  button: {
-marginVertical :20
-  },
+//   button: {
+// marginVertical :20
+//   },
   txtBtn: {
     color: '#FFFFFF',
     fontFamily: 'Mulish-ExtraBold',

@@ -23,7 +23,7 @@ const DetailLesson = () => {
   const [errorText, setErrorText] = useState('');
   const [completedTests, setCompletedTests] = useState({});
   const [refreshing, setRefreshing] = useState(false);
-  const [retryTestId, setRetryTestId] = useState(null); 
+  const [retryTestId, setRetryTestId] = useState(null);
   const timerRef = useRef(null);
 
 
@@ -98,7 +98,7 @@ const DetailLesson = () => {
       setModalVisible(true);
       return;
     }
-  
+
     fetch(`${BASE_URL}/score/scores/canTakeTest/${userID}/${testId}`)
       .then((response) => response.json())
       .then((json) => {
@@ -123,7 +123,7 @@ const DetailLesson = () => {
         setErrorText('Lỗi hệ thống, vui lòng thử lại sau.');
       });
   };
-  
+
 
   const renderTestItem = ({ item, index }) => {
     const updatedAt = item.updatedAt.split('T')[0];
@@ -198,7 +198,7 @@ const DetailLesson = () => {
 
       // Gán _id thành courseID 
       const testIdDone = _id;
-      navigation.navigate('MyCourseDetail', { testIdDone, userID ,courseID});
+      navigation.navigate('MyCourseDetail', { testIdDone, userID, courseID });
     }
   };
 
@@ -211,7 +211,7 @@ const DetailLesson = () => {
         <Text style={styles.headerTitle}>Video & Bài Quizz</Text>
       </View>
 
-  
+
 
       {isPlaying && videoLink ? (
         <View style={{ flex: 1 }}>

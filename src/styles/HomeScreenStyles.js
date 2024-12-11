@@ -136,7 +136,7 @@ const styles = StyleSheet.create({
         justifyContent: "space-between",
         alignItems: 'center',
         paddingRight: 10,
-        marginBottom: 10,
+     marginTop : 10
 
     },
     title: {

@@ -12,7 +12,7 @@ function App(): React.JSX.Element {
 
       {/* Toast component to show messages */}
       <Toast />
-      {/* <UpdatePassword/> */}
+     
     </SafeAreaView>
   );
 }

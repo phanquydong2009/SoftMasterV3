@@ -14,7 +14,7 @@ import BASE_URL from '../component/apiConfig';
 
 const CourseScreen = ({ route }) => {
   const { userID } = route.params;
-  const [selected, setSelected] = useState(1);
+  const [selected, setSelected] = useState(2);
   const [courses, setCourses] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [refreshing, setRefreshing] = useState(false);
@@ -44,27 +44,38 @@ const CourseScreen = ({ route }) => {
         `${BASE_URL}/enrollCourse/getCourseUserEnrolled/${userID}`
       );
       const enrolledCourses = response.data;
-
+  
       const courseDetails = await Promise.all(
         enrolledCourses.map(async (course) => {
-          const courseDetailURL = `${BASE_URL}/course/getDetailByCourseID/${course.courseID._id}`;
-          const courseDetailResponse = await axios.get(courseDetailURL);
-          return {
-            ...courseDetailResponse.data,
-            progress: 'Chưa bắt đầu',
-            progressWidth: '0%',
-            status: 'đang thực hiện',
-            isCompleted: courseIdDone.includes(course.courseID._id),
-          };
+          if (course.courseID) {
+            const courseDetailURL = `${BASE_URL}/course/getDetailByCourseID/${course.courseID._id}`;
+            const courseDetailResponse = await axios.get(courseDetailURL);
+            return {
+              ...courseDetailResponse.data,
+              progress: 'Chưa bắt đầu',
+              progressWidth: '0%',
+              status: 'đang thực hiện',
+              isCompleted: courseIdDone.includes(course.courseID._id),
+              createdAt: courseDetailResponse.data.createdAt,
+            };
+          } else {
+            return null; // Bỏ qua nếu courseID là null
+          }
         })
       );
-
-      setCourses(courseDetails);
+  
+      // Sắp xếp theo `createdAt` tăng dần
+      const sortedCourses = courseDetails
+        .filter((course) => course !== null)
+        .sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
+  
+      setCourses(sortedCourses);
     } catch (error) {
       console.error('Lỗi khi lấy dữ liệu khóa học:', error);
     }
   }, [userID, courseIdDone]);
-
+  
+  
   useEffect(() => {
     fetchCertificates().then(fetchCourses); // Gọi fetchCourses sau khi lấy danh sách chứng chỉ
   }, [fetchCertificates, fetchCourses]);

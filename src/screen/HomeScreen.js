@@ -1,8 +1,6 @@
-import React, { useState, useEffect } from 'react';
-import { ScrollView, FlatList, TouchableOpacity, Text, View, Image, RefreshControl } from 'react-native';
+import React, { useState } from 'react';
+import { ScrollView, TouchableOpacity, Text, View, Image, RefreshControl } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
-import axios from 'axios';
-import BASE_URL from '../component/apiConfig';
 import styles from '../styles/HomeScreenStyles';
 import FollowTeacherCourse from '../component/FollowTeacherCourse';
 import TopCourse from '../component/TopCourse';
@@ -11,34 +9,18 @@ import Slider from '../component/Slider';
 import Notification from '../component/Notification';
 
 const HomeScreen = () => {
-    const [selectedCourse, setSelectedCourse] = useState('Tất cả');
-    const [subjects, setSubjects] = useState([]);
     const [refreshing, setRefreshing] = useState(false);
 
     const navigation = useNavigation();
     const route = useRoute();
     const { name, userID } = route.params || {};
 
-    // Fetch subjects
-    const fetchSubjects = async () => {
-        try {
-            const response = await axios.get(`${BASE_URL}/subject/getAll`);
-            setSubjects(response.data.map(subject => subject.name));
-        } catch (error) {
-            console.error('Error fetching subjects:', error);
-        }
-    };
-
     // Handle pull-to-refresh
     const onRefresh = async () => {
         setRefreshing(true);
-        await fetchSubjects();
+        // Add any necessary refresh logic here
         setRefreshing(false);
     };
-
-    useEffect(() => {
-        fetchSubjects();
-    }, []);
 
     const handleViewAllMentor = () => {
         navigation.navigate('AllMentor', { userID });
@@ -51,22 +33,6 @@ const HomeScreen = () => {
     const handleSearch = () => {
         navigation.navigate('Search', { userID });
     };
-
-    // Render course items in FlatList
-    const renderCourseItem = ({ item }) => (
-        <TouchableOpacity
-            style={[
-                styles.courseItem,
-                {
-                    backgroundColor: item === selectedCourse ? '#2795FF' : '#E8F1FF',
-                    borderRadius: 20,
-                },
-            ]}
-            onPress={() => setSelectedCourse(item)}
-        >
-            <Text style={[styles.courseText, { color: item === selectedCourse ? '#FFFFFF' : '#202244' }]}>{item}</Text>
-        </TouchableOpacity>
-    );
 
     return (
         <ScrollView
@@ -86,9 +52,8 @@ const HomeScreen = () => {
 
                 {/* Notifications */}
                 <Notification userID={userID} refreshing={refreshing} onRefresh={onRefresh} />
-
-
             </View>
+
             {/* Search Button */}
             <View style={styles.searchContainer}>
                 <TouchableOpacity onPress={handleSearch} style={styles.searchButton}>
@@ -96,18 +61,9 @@ const HomeScreen = () => {
                     <Text style={styles.textInput}>Tìm kiếm</Text>
                 </TouchableOpacity>
             </View>
+
             {/* Slider */}
             <Slider />
-
-            {/* Subject List */}
-            <FlatList
-                data={subjects}
-                renderItem={renderCourseItem}
-                keyExtractor={(item) => `course-${item}`}
-                horizontal
-                showsHorizontalScrollIndicator={false}
-                style={styles.ListSuject}
-            />
 
             {/* Popular Courses */}
             <View style={styles.popularCourses}>

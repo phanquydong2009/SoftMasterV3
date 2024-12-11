@@ -1,17 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import { StyleSheet, Text, View, TouchableOpacity, Image, FlatList } from 'react-native';
-import { useNavigation, useRoute } from '@react-navigation/native'; 
+import { useNavigation, useRoute } from '@react-navigation/native';
 import BASE_URL from '../component/apiConfig';
 import styles from '../styles/PopularCoursesStyles';
 
 const PopularCourses = () => {
     const navigation = useNavigation();
-    const route = useRoute(); 
+    const route = useRoute();
     const { userID, courseName } = route.params;
-    const [activeCourse, setActiveCourse] = useState(courseName || 'Tất cả'); 
-    const [activeBookmarks, setActiveBookmarks] = useState({}); 
-    const [courses, setCourses] = useState([]); 
-    const [courseDetails, setCourseDetails] = useState([]); 
+    const [activeCourse, setActiveCourse] = useState(courseName || 'Tất cả');
+    const [activeBookmarks, setActiveBookmarks] = useState({});
+    const [courses, setCourses] = useState([]);
+    const [courseDetails, setCourseDetails] = useState([]);
     const [refreshing, setRefreshing] = useState(false); // Thêm trạng thái để refresh màn hình
 
     // Hàm lấy danh sách các môn học
@@ -19,7 +19,7 @@ const PopularCourses = () => {
         try {
             const response = await fetch(`${BASE_URL}/subject/getAll`);
             const data = await response.json();
-            setCourses([{ _id: null, name: 'Tất cả' }, ...data]); // Thêm mục "Tất cả" vào đầu danh sách
+            setCourses([{ _id: null, name: 'Tất cả' }, ...data]); // Thêm mục "Tất cả" vào đầu danh sách 
         } catch (error) {
             console.error('Lỗi khi lấy danh sách môn học:', error);
         }
@@ -30,25 +30,31 @@ const PopularCourses = () => {
         try {
             let response;
             if (activeCourse === 'Tất cả') {
-                response = await fetch(`${BASE_URL}/course/getAll`);
+                response = await fetch(`${BASE_URL}/course/getBlockedCourses`);
             } else {
                 const subject = courses.find(course => course.name === activeCourse);
                 if (subject) {
                     response = await fetch(`${BASE_URL}/course/getCourseBySubjectID/${subject._id}`);
                 }
             }
-    
+
             if (response) {
                 const data = await response.json();
-                // Sắp xếp dữ liệu theo `createdAt` giảm dần
-                const sortedData = data.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-                setCourseDetails(sortedData);
+                if (Array.isArray(data) && data.length > 0) {
+                    // Sắp xếp dữ liệu theo `createdAt` giảm dần
+                    const sortedData = data.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+                    setCourseDetails(sortedData);
+                } else {
+                    setCourseDetails([]); // Nếu không có dữ liệu, đặt danh sách thành mảng trống
+                }
             }
         } catch (error) {
             console.error('Lỗi khi lấy chi tiết khóa học:', error);
+            setCourseDetails([]); // Đảm bảo không để `courseDetails` undefined nếu có lỗi
         }
     };
-    
+
+
 
     // UseEffect để fetch danh sách môn học và chi tiết khóa học
     useEffect(() => {
@@ -62,9 +68,9 @@ const PopularCourses = () => {
     // Hàm xử lý khi kéo để làm mới (pull-to-refresh)
     const onRefresh = async () => {
         setRefreshing(true);
-        await fetchCourses(); 
+        await fetchCourses();
         await fetchCourseDetails();
-        setRefreshing(false); 
+        setRefreshing(false);
     };
 
     // Hàm xử lý quay lại trang trước
@@ -82,11 +88,11 @@ const PopularCourses = () => {
 
     // Render mỗi item môn học (scroll ngang)
     const renderCourseItem = ({ item }) => {
-        const isActive = item.name === activeCourse; 
+        const isActive = item.name === activeCourse;
         return (
             <TouchableOpacity
                 style={[styles.courseItem, { backgroundColor: isActive ? '#167F71' : '#E8F1FF' }]}
-                onPress={() => setActiveCourse(item.name)} 
+                onPress={() => setActiveCourse(item.name)}
             >
                 <Text style={[styles.courseText, { color: isActive ? '#FFFFFF' : '#202244' }]}>
                     {item.name}
@@ -97,7 +103,7 @@ const PopularCourses = () => {
 
     // Render chi tiết khóa học
     const renderDetailItem = ({ item }) => {
-        const isBookmarked = activeBookmarks[item._id]; 
+        const isBookmarked = activeBookmarks[item._id];
         const handleDetail = () => {
             console.log("courseId:", item._id, "userID:", userID);
             navigation.navigate('Detail', { courseId: item._id, userID });
@@ -147,24 +153,28 @@ const PopularCourses = () => {
                 <FlatList
                     data={courses}
                     renderItem={renderCourseItem}
-                    keyExtractor={(item) => item._id ? item._id.toString() : item.name} 
+                    keyExtractor={(item) => item._id ? item._id.toString() : item.name}
                     horizontal
                     showsHorizontalScrollIndicator={false}
                     contentContainerStyle={styles.flatListContainer}
                 />
             </View>
-
             <View style={styles.detailsWrapper}>
-                <FlatList
-                    data={courseDetails}
-                    renderItem={renderDetailItem}
-                    keyExtractor={(item) => item._id.toString()}
-                    contentContainerStyle={styles.detailsContainer}
-                    refreshing={refreshing}
-                    onRefresh={onRefresh} 
-                    showsVerticalScrollIndicator={false} 
-                />
+                {courseDetails.length === 0 ? (
+                    <Text style={styles.emptyMessage}>Không có khóa học nào để hiển thị</Text>
+                ) : (
+                    <FlatList
+                        data={courseDetails}
+                        renderItem={renderDetailItem}
+                        keyExtractor={(item) => item._id.toString()}
+                        contentContainerStyle={styles.detailsContainer}
+                        refreshing={refreshing}
+                        onRefresh={onRefresh}
+                        showsVerticalScrollIndicator={false}
+                    />
+                )}
             </View>
+
         </View>
     );
 };
