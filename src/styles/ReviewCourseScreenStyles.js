@@ -99,7 +99,7 @@ const styles = StyleSheet.create({
   },
   txtUser: {
     color: 'black',
-    fontSize: 14,
+    fontSize: 17,
     fontFamily: 'Mulish-Bold',
 
     

@@ -1,13 +1,12 @@
 import {
-
   Text,
   View,
   Image,
- 
   ActivityIndicator,
   TouchableOpacity,
-
+  Button
 } from 'react-native';
+import Modal from 'react-native-modal';
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useRoute, useNavigation } from '@react-navigation/native';
@@ -30,6 +29,8 @@ const ProfileMentor = () => {
   const [courseCount, setCourseCount] = useState(0);
   const [noCoursesMessage, setNoCoursesMessage] = useState("");
   const [isFollowing, setIsFollowing] = useState(false);
+  // Khai báo state cho modalVisible
+  const [modalVisible, setModalVisible] = useState(false);
 
   useEffect(() => {
     // Tải trạng thái theo dõi từ AsyncStorage khi tải màn hình
@@ -116,12 +117,26 @@ const ProfileMentor = () => {
     navigation.goBack();
   };
 
-  const handleAddReview = () => {
-    const teacherID = _id;
 
+// ddi sang màn đánh giá
+  const handleAddReview = async () => {
+    // Kiểm tra đã theo dõi giảng viên chưa
+    if (!isFollowing) {
+      // Mở modal khi người dùng chưa theo dõi giảng viên
+      setModalVisible(true);
+      return;
+    }
+
+    const teacherID = _id;
     navigation.navigate('ReviewScreen', { teacherID, userID });
-    console.log('đi :', teacherID, userID)
+    // console.log('đi :', teacherID, userID); 
   };
+
+  // Hàm để đóng modal
+  const closeModal = () => {
+    setModalVisible(false);
+  };
+
 
 
   const handleButtonPress = isCoursesButton => {
@@ -147,98 +162,98 @@ const ProfileMentor = () => {
 
   // fetch dữ liệu khóa học và đánh giá
   useEffect(() => {
-   
+
     const fetchCourses = async () => {
       const response = await axios.get(`${BASE_URL}/course/getCourseByTeacherID/${_id}`);
       //map lại để định dạng lại dữ liệu hoặc trả về mảng rỗng
       const courseData = response.data.length
         ? response.data.map(course => ({
-            id: course._id,
-            image: { uri: course.img },
-            nameCourse: course.name,
-            nameLesson: course.describe,
-            quiz: `${new Intl.NumberFormat('vi-VN').format(course.price)} VNĐ`,
-            createdAt: course.createdAt,
-          }))
+          id: course._id,
+          image: { uri: course.img },
+          nameCourse: course.name,
+          nameLesson: course.describe,
+          quiz: `${new Intl.NumberFormat('vi-VN').format(course.price)} VNĐ`,
+          createdAt: course.createdAt,
+        }))
         : [];
-  
+
       // Sắp xếp 
       courseData.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-  
+
       setData(courseData); // Cập nhật dữ liệu  vào state
       // Nếu không có khóa học
       if (!courseData.length) setNoCoursesMessage("Chưa có khóa học nào");
     };
-  
+
     // Hàm lấy danh sách đánh giá từ API
     const fetchFeedback = async () => {
       const response = await axios.get(`${BASE_URL}/feedbackTeacher/getFeedbackByTeacherID/${_id}`);
-     
+
       const feedbackData = response.data.length
         ? await Promise.all(
-            response.data.map(async feedback => {
-              let userAvatar = feedback.userID?.avatar;
-  
-              // Nếu không có avatar, lấy avatar từapi get userByID
-              if (!userAvatar && feedback.userID?._id) {
-                try {
-                  const userResponse = await axios.get(`${BASE_URL}/user/getUserByID/${feedback.userID._id}`);
-                  userAvatar = userResponse.data?.avatar;
-                } catch (userError) {
-                  // Xử lý lỗi nếu cần
-                }
+          response.data.map(async feedback => {
+            let userAvatar = feedback.userID?.avatar;
+
+            // Nếu không có avatar, lấy avatar từapi get userByID
+            if (!userAvatar && feedback.userID?._id) {
+              try {
+                const userResponse = await axios.get(`${BASE_URL}/user/getUserByID/${feedback.userID._id}`);
+                userAvatar = userResponse.data?.avatar;
+              } catch (userError) {
+                // Xử lý lỗi nếu cần
               }
-  
-              // Nếu không có avatar, dùng ảnh mặc định
-              const avatarImage = userAvatar ? { uri: userAvatar } : require('../design/image/noprofile.png');
-  
-              return {
-                id: feedback._id,
-                name: feedback.userID?.name || "Không có tên người dùng",
-                img: avatarImage,
-                rating: feedback.feedbackDetail?.rating || 0,
-                comment: feedback.feedbackDetail?.content || "Không có nhận xét",
-                love: '0',
-                createdAt: feedback.feedbackDetail
-                  ? new Date(feedback.feedbackDetail.createdAt).toLocaleDateString()
-                  : 'Ngày không xác định',
-              };
-            })
-          )
+            }
+
+            // Nếu không có avatar, dùng ảnh mặc định
+            const avatarImage = userAvatar ? { uri: userAvatar } : require('../design/image/noprofile.png');
+
+            return {
+              id: feedback._id,
+              name: feedback.userID?.name || "Không có tên người dùng",
+              img: avatarImage,
+              rating: feedback.feedbackDetail?.rating || 0,
+              comment: feedback.feedbackDetail?.content || "Không có nhận xét",
+              love: '0',
+              createdAt: feedback.feedbackDetail
+                ? new Date(feedback.feedbackDetail.createdAt).toLocaleDateString()
+                : 'Ngày không xác định',
+            };
+          })
+        )
         : [];
-  
+
       // Sắp xếp đánh giá theo ngày tạo, mới nhất ở trên cùng
       feedbackData.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-  
+
       setData(feedbackData);
-      setFeedbackCount(feedbackData.length); 
-   
+      setFeedbackCount(feedbackData.length);
+
       if (!feedbackData.length) setNoCoursesMessage("Không có đánh giá nào");
     };
-  
+
     // Hàm chung để gọi hàm lấy dữ liệu, có thể là khóa học hoặc đánh giá
     const fetchContent = async () => {
-      setLoading(true); 
+      setLoading(true);
       setNoCoursesMessage("");
-  
+
       try {
         if (isCourses) {
           await fetchCourses();
         } else {
-          await fetchFeedback(); 
+          await fetchFeedback();
         }
       } catch (error) {
-        setData([]); 
-        setNoCoursesMessage("Không có đánh giá nào"); 
+        setData([]);
+        setNoCoursesMessage("Không có đánh giá nào");
       } finally {
-        setLoading(false); 
+        setLoading(false);
       }
     };
-  
+
     // Gọi hàm fetchContent để thực hiện tải dữ liệu
     fetchContent();
   }, [isCourses, _id]); // Hook phụ thuộc vào biến isCourses và _id
-  
+
   if (loading) {
     return (
       <View style={styles.container}>
@@ -325,7 +340,27 @@ const ProfileMentor = () => {
           />
         </TouchableOpacity>
       )}
+      {/* Modal thông báo lỗi */}
+      <Modal
+      isVisible={modalVisible} // Kiểm tra trạng thái của modal
+      onBackdropPress={closeModal} // Đóng modal khi nhấn ra ngoài
+      backdropColor="rgba(0, 0, 0, 0.5)" // Màu nền của backdrop
+      backdropOpacity={0.5} // Độ mờ của nền
+    >
+      <View style={styles.modalContainer}>
+   
+        <Image
+          source={require('../design/image/fl.png')} 
+          style={styles.image}
+        />
+        <Text style={styles.modalTitle}>
+        Bạn cần theo dõi giảng viên để có thể xem và đánh giá.
+        </Text>
+        <Button title="Đóng" onPress={closeModal} color="#0961F5"  />
+      </View>
+    </Modal>
     </View>
+
   );
 };
 

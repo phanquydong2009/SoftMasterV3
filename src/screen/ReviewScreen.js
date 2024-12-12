@@ -53,47 +53,71 @@ const ReviewScreen = () => {
   };
 
   const handleSubmitReview = () => {
+    // Kiểm tra xem người dùng đã chọn sao và nhập bình luận chưa
     if (selectedStars === 0 || comment.trim() === '') {
       setErrorMessage('Vui lòng chọn sao và nhập đánh giá của bạn!');
       setErrorModalVisible(true);
-      return;
+      return; 
     }
-
-    // Send POST request to the API
+  
+    // Kiểm tra xem người dùng đã đánh giá giảng viên này chưa
+    const isAlreadyReviewed = reviews.some(review => review.username === 'Người dùng ' && review.teacherID === teacherID);
+    
+    if (isAlreadyReviewed) {
+      // Nếu đã đánh giá giảng viên này rồi, hiển thị thông báo lỗi và không tạo newReview
+      setErrorMessage('Bạn đã đánh giá giảng viên này rồi!');
+      setErrorModalVisible(true);
+      return; // Dừng lại không gửi yêu cầu API và không tạo newReview
+    }
+  
+    // Tạo dữ liệu đánh giá mới để thêm vào danh sách tạm thời
+    const newReview = {
+      stars: selectedStars, 
+      comment: comment, 
+      timestamp: new Date(), 
+      username: 'Người dùng ', // Cập nhật với tên người dùng thật nếu có
+      teacherID: teacherID, // Thêm ID giảng viên để xác định đánh giá của giảng viên này
+    };
+  
+    // Thêm đánh giá mới vào đầu danh sách các đánh giá
+    setReviews([newReview, ...reviews]);
+  
+    // Gửi yêu cầu POST lên API để lưu đánh giá
     fetch(`${BASE_URL}/feedbackTeacher/feedback/${userID}/${teacherID}`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        rating: selectedStars,
-        content: comment,
+        rating: selectedStars, 
+        content: comment, 
       }),
     })
       .then((response) => {
         if (!response.ok) {
-          throw new Error('DuplicateReview'); // Handle duplicate review scenario
+          throw new Error('ErrorSendingReview'); // Nếu không gửi được, ném lỗi
         }
         return response.json();
       })
       .then((data) => {
         console.log('Đánh giá đã được gửi:', data);
-        setModalVisible(true); // Show success modal
-        // Optionally refresh the reviews list here if needed
+        setModalVisible(true); // Hiển thị modal thành công
       })
       .catch((error) => {
-        if (error.message === 'DuplicateReview') {
-          setErrorMessage('Bạn đã đánh giá giảng viên này rồi!');
-        } else {
+        // Xử lý lỗi khi gửi đánh giá
+        if (error.message === 'ErrorSendingReview') {
           setErrorMessage('Đã xảy ra lỗi khi gửi đánh giá. Vui lòng thử lại sau!');
+        } else {
+          setErrorMessage('Đã xảy ra lỗi không xác định!');
         }
-        setErrorModalVisible(true);
+        setErrorModalVisible(true); // Hiển thị modal lỗi
       });
-
-    // Reset the form fields
-    setSelectedStars(0);
-    setComment('');
+  
+    // Reset các trường nhập liệu sau khi gửi đánh giá
+    setSelectedStars(0); // Đặt lại số sao đã chọn
+    setComment(''); // Đặt lại nội dung bình luận
   };
+  
 
 
   const getElapsedTime = (timestamp) => {

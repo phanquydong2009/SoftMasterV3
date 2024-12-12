@@ -1,5 +1,4 @@
 import {
-
   Text,
   View,
   Image,
@@ -17,16 +16,20 @@ const ReviewCourseScreen = () => {
   const route = useRoute();
   const navigation = useNavigation();
   const { courseId, userID } = route.params;
+
   const [reviews, setReviews] = useState([]);
   const [isModalVisible, setModalVisible] = useState(false);
   const [selectedStars, setSelectedStars] = useState(0);
   const [comment, setComment] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
+  const [isEnrolled, setIsEnrolled] = useState(null);  // Kiểm tra trạng thái tham gia khóa học
 
   useEffect(() => {
     fetchFeedbacks();
+    checkEnrollment();  // Kiểm tra nếu người dùng đã tham gia khóa học khi component được render
   }, []);
 
+  // Lấy feedback của khóa học
   const fetchFeedbacks = async () => {
     try {
       const response = await fetch(`${BASE_URL}/feedbackCourse/getFeedbackByCourseID/${courseId}`);
@@ -37,49 +40,14 @@ const ReviewCourseScreen = () => {
         return;
       }
 
-      // Tạo một bộ nhớ cache cho dữ liệu người dùng
-      const userCache = new Map();
-
-      const feedbacksWithUser = await Promise.all(
-        feedbackData.map(async feedback => {
-
-          // Kiểm tra nếu userID là một đối tượng đã chứa name
-          if (typeof feedback.userID === 'object' && feedback.userID.name) {
-            return { ...feedback, userName: feedback.userID.name };
-          }
-
-          // Kiểm tra nếu dữ liệu người dùng đã có trong cache
-          if (userCache.has(feedback.userID)) {
-
-            return { ...feedback, userName: userCache.get(feedback.userID).name };
-          }
-
-          try {
-            // Nếu chưa có trong cache, gọi API để lấy dữ liệu người dùng
-
-            const userResponse = await fetch(`${BASE_URL}/user/getUserByID/${feedback.userID}`);
-            const userData = await userResponse.json();
-
-            // Lưu vào cache để sử dụng lại lần sau
-            userCache.set(feedback.userID, userData);
-            return { ...feedback, userName: userData.name };
-          } catch (error) {
-
-            return { ...feedback, userName: 'Unknown' }; // Xử lý fallback nếu có lỗi
-          }
-        })
-      );
-
-
-      setReviews(feedbacksWithUser);
+      setReviews(feedbackData);
     } catch (error) {
-
       setReviews([]);
     }
   };
 
-
-  const formatDate = dateString => {
+  // Định dạng ngày tháng
+  const formatDate = (dateString) => {
     const date = new Date(dateString);
     const day = String(date.getDate()).padStart(2, '0');
     const month = String(date.getMonth() + 1).padStart(2, '0');
@@ -89,19 +57,18 @@ const ReviewCourseScreen = () => {
     return `${day}/${month}/${year} ${hours}:${minutes}`;
   };
 
+  // Render review item
   const renderItem = ({ item }) => {
     const stars = '⭐'.repeat(item.feedbackDetail.rating);
 
     return (
       <View style={styles.itemReview}>
         <View style={styles.row}>
-        <Text style={styles.txtUser}>{item.userName}</Text>
+          {/* Dùng trực tiếp userName từ feedback item */}
+          <Text style={styles.txtUser}>{item.userID.name}</Text>
           <Text style={styles.txtRate}>{stars}</Text>
-        
         </View>
-
         <Text style={styles.txtContent}>{item.feedbackDetail.content}</Text>
-
         <Text style={styles.txtTime}>
           {formatDate(item.feedbackDetail.updatedAt)}
         </Text>
@@ -109,41 +76,31 @@ const ReviewCourseScreen = () => {
     );
   };
 
-  const handleGoBack = () => {
-    navigation.goBack();
+  // Kiểm tra nếu người dùng đã tham gia khóa học
+  const checkEnrollment = async () => {
+    if (!userID || !courseId) return;
+
+    const enrollmentUrl = `${BASE_URL}/enrollCourse/check-enrollment/${userID}/${courseId}`;
+    try {
+      const response = await fetch(enrollmentUrl);
+      const data = await response.json();
+      setIsEnrolled(data.enrolled);  // Cập nhật trạng thái tham gia
+    } catch (error) {
+      setErrorMessage('Không thể kiểm tra thông tin tham gia khóa học.');
+    }
   };
 
-  const handleStarPress = index => {
+  // Xử lý chọn sao
+  const handleStarPress = (index) => {
     setSelectedStars(index + 1);
   };
+
+  // Gửi đánh giá
   const handleSubmitReview = async () => {
     if (!userID || !courseId) {
       return;
     }
 
-    // Kiểm tra xem người dùng đã tham gia khóa học chưa
-    const enrollmentUrl = `${BASE_URL}/enrollCourse/check-enrollment/${userID}/${courseId}`;
-    try {
-      const enrollmentResponse = await fetch(enrollmentUrl);
-
-      if (!enrollmentResponse.ok) {
-        setErrorMessage('Không thể kiểm tra thông tin tham gia khóa học.');
-        return;
-      }
-
-      const enrollmentData = await enrollmentResponse.json();
-
-      if (!enrollmentData.enrolled) {
-        setErrorMessage('Bạn chưa tham gia khóa học này.');
-        return;
-      }
-    } catch (error) {
-      console.error('Lỗi khi kiểm tra tham gia khóa học:', error);
-      setErrorMessage('Không thể kết nối đến máy chủ để kiểm tra tham gia khóa học.');
-      return;
-    }
-
-    // Nếu đã tham gia khóa học, tiếp tục gửi feedback
     const feedbackUrl = `${BASE_URL}/feedbackCourse/feedback/${userID}/${courseId}`;
     try {
       const response = await fetch(feedbackUrl, {
@@ -168,12 +125,23 @@ const ReviewCourseScreen = () => {
         setErrorMessage(errorData.message || 'Đã xảy ra lỗi khi gửi đánh giá.');
       }
     } catch (error) {
-      console.error('Error submitting feedback:', error);
       setErrorMessage('Không thể kết nối đến máy chủ.');
     }
   };
 
+  // Xử lý khi người dùng bấm "Viết đánh giá"
+  const handleWriteReviewPress = () => {
+    if (!isEnrolled) {
+      setErrorMessage('Bạn chưa tham gia khóa học nên không thể đánh giá cho khóa học này được!');
+    } else {
+      setModalVisible(true);
+    }
+  };
 
+  // Quay lại màn hình trước
+  const handleGoBack = () => {
+    navigation.goBack();
+  };
 
   return (
     <View style={styles.container}>
@@ -190,15 +158,20 @@ const ReviewCourseScreen = () => {
           <Text style={styles.count_numberText}>{reviews.length}</Text>
         </View>
       </View>
+
       <FlatList
         data={reviews}
-        keyExtractor={item => item._id}
+        keyExtractor={(item) => item._id}
         renderItem={renderItem}
       />
+
       <Text style={styles.errorTxt}>{errorMessage}</Text>
 
       <View style={styles.ViewAll}>
-        <TouchableOpacity style={styles.btnViewAllReview} onPress={() => setModalVisible(true)}>
+        <TouchableOpacity
+          style={styles.btnViewAllReview}
+          onPress={handleWriteReviewPress}
+        >
           <Text style={styles.txtViewAllReview}>Viết đánh giá</Text>
         </TouchableOpacity>
       </View>
