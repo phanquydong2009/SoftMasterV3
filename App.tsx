@@ -2,7 +2,7 @@ import React from 'react';
 import {SafeAreaView, StyleSheet} from 'react-native';
 import AppNavigator from './src/component/AppNavigator';
 import Toast from 'react-native-toast-message';
-import UpdatePassword from './src/screen/UpdatePassword';
+
 
 function App(): React.JSX.Element {
   return (

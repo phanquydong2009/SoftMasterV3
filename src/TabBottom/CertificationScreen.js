@@ -22,7 +22,7 @@ const CertificationScreen = () => {
   const [loading, setLoading] = useState(true); // Trạng thái tải dữ liệu
   const [refreshing, setRefreshing] = useState(false); // Trạng thái cho chức năng kéo để làm mới
 
-  // Định nghĩa hàm fetchCertificates ngoài useEffect để có thể sử dụng ở nhiều nơi
+  // Hàm fetch chứng chỉ
   const fetchCertificates = async () => {
     try {
       setLoading(true);
@@ -34,22 +34,23 @@ const CertificationScreen = () => {
   
       setCertificates(sortedData);
     } catch (error) {
-      console.error('Lỗi khi lấy dữ liệu từ API:', error);
+      // console.error('Lỗi khi lấy dữ liệu từ API:', error);
     } finally {
       setLoading(false);
     }
   };
 
+  // useEffect để lấy dữ liệu khi có userID
   useEffect(() => {
     if (userID) {
-      fetchCertificates(); 
+      fetchCertificates(); // Lấy chứng chỉ khi userID thay đổi
     }
   }, [userID]);
 
   // Hàm làm mới dữ liệu khi kéo xuống
   const onRefresh = async () => {
     setRefreshing(true);
-    await fetchCertificates();  
+    await fetchCertificates(); // Lấy lại dữ liệu khi làm mới
     setRefreshing(false);
   };
 

@@ -59,7 +59,7 @@ const CourseScreen = ({ route }) => {
               createdAt: courseDetailResponse.data.createdAt,
             };
           } else {
-            return null; // Bỏ qua nếu courseID là null
+            return null; 
           }
         })
       );
@@ -67,7 +67,7 @@ const CourseScreen = ({ route }) => {
       // Sắp xếp theo `createdAt` tăng dần
       const sortedCourses = courseDetails
         .filter((course) => course !== null)
-        .sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
+        .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
   
       setCourses(sortedCourses);
     } catch (error) {

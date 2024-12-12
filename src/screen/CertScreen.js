@@ -33,7 +33,7 @@ const CertScreen = ({ route }) => {
     <SafeAreaView style={styles.container}>
       <ToolBar title={'Chứng chỉ'} />
       {/* Sử dụng ref cho ViewShot */}
-      <ForwardedViewShot ref={certViewRef} style={styles.saveImg} options={{ format: 'jpg', quality: 0.9 }}>
+      <ViewShot ref={certViewRef} style={styles.saveImg} options={{ format: 'jpg', quality: 0.9 }}>
         <BodyCert 
           certificateID={certificateID}  
           userName={userName}
@@ -41,73 +41,17 @@ const CertScreen = ({ route }) => {
           teacherName={teacherName}
           updatedAt={formattedDate}  
         />
-      </ForwardedViewShot>
+      </ViewShot>
       <ButtonDownload certViewRef={certViewRef} />
       <Toast ref={(ref) => Toast.setRef(ref)} /> 
     </SafeAreaView>
   );
 };
 
-// Wrap ViewShot component with forwardRef
-const ForwardedViewShot = React.forwardRef((props, ref) => (
-  <ViewShot {...props} ref={ref} />
-));
-
-const ButtonDownload = ({ certViewRef }) => {
-  const handleDownload = async () => {
-    try {
-      // Kiểm tra nếu ref tồn tại trước khi gọi capture
-      if (certViewRef?.current) {
-        // Chụp ảnh toàn bộ BodyCert
-        const uri = await certViewRef.current.capture(); // capture() sẽ chụp ảnh giao diện
-        const downloadDest = `${RNFS.ExternalDirectoryPath}/certificate.jpg`; // Đường dẫn lưu ảnh vào bộ nhớ
-
-        // Di chuyển ảnh vừa chụp đến thư mục tải về
-        await RNFS.moveFile(uri, downloadDest);
-
-        // Hiển thị thông báo thành công
-        Toast.show({
-          type: 'success',
-          position: 'bottom',
-          text1: 'Thành công',
-          text2: 'Chứng chỉ đã được tải xuống!',
-          visibilityTime: 3000,
-          autoHide: true,
-          topOffset: 30,
-        });
-      } else {
-        throw new Error("Không tìm thấy ref của ViewShot.");
-      }
-    } catch (error) {
-      console.error('Lỗi khi tải chứng chỉ:', error);
-      // Hiển thị thông báo lỗi
-      Toast.show({
-        type: 'error',
-        position: 'bottom',
-        text1: 'Lỗi',
-        text2: 'Không thể tải chứng chỉ!',
-        visibilityTime: 3000,
-        autoHide: true,
-        topOffset: 30,
-      });
-    }
-  };
-
+// Sửa BodyCert để nhận ref (Bọc với forwardRef)
+const BodyCert = React.forwardRef(({ certificateID, userName, nameCourse, teacherName, updatedAt }, ref) => {
   return (
-    <TouchableOpacity style={styles.button} onPress={handleDownload}>
-      <Text style={styles.buttonTitle}>Tải xuống chứng chỉ</Text>
-      <Image
-        source={require('../design/image/Circle.png')}
-        style={styles.buttonImage}
-      />
-    </TouchableOpacity>
-  );
-};
-
-
-const BodyCert = ({ certificateID, userName, nameCourse, teacherName, updatedAt }) => {
-  return (
-    <View style={styles.container_body}>
+    <View style={styles.container_body} ref={ref}>
       <Image source={require('../design/image/waveTopRight.png')} style={styles.waveTopRight} />
       <Image source={require('../design/image/waveBottomLeft.png')} style={styles.waveBottomLeft} />
       <Image source={require('../design/image/doneCert.jpg')} style={styles.certImage} />
@@ -125,7 +69,60 @@ const BodyCert = ({ certificateID, userName, nameCourse, teacherName, updatedAt 
       </View>
     </View>
   );
+});
+
+// Button download component
+const ButtonDownload = ({ certViewRef }) => {
+  const handleDownload = async () => {
+    try {
+      // Kiểm tra nếu ref tồn tại trước khi gọi capture
+      if (certViewRef?.current) {
+        // Chụp ảnh toàn bộ BodyCert
+        const uri = await certViewRef.current.capture(); // capture() sẽ chụp ảnh giao diện
+        const downloadDest = `${RNFS.ExternalDirectoryPath}/certificate.jpg`; // Đường dẫn lưu ảnh vào bộ nhớ
+  
+        // Di chuyển ảnh vừa chụp đến thư mục tải về
+        await RNFS.moveFile(uri, downloadDest);
+  
+        // Hiển thị thông báo thành công
+        Toast.show({
+          type: 'success',
+          position: 'bottom',
+          text1: 'Thành công',
+          text2: 'Chứng chỉ đã được tải xuống!',
+          visibilityTime: 3000,
+          autoHide: true,
+          topOffset: 30,
+        });
+      } else {
+        // Log the error without showing a toast message
+        console.error("Không tìm thấy ref của ViewShot.");
+      }
+    } catch (error) {
+ 
+      // Optionally, show a user-friendly toast
+      Toast.show({
+        type: 'error',
+        position: 'bottom',
+        text1: 'Lỗi',
+        text2: 'Không thể tải chứng chỉ!',
+        visibilityTime:2000,
+        autoHide: true,
+        topOffset: 30,
+      });
+    }
+  };
+  
+
+  return (
+    <TouchableOpacity style={styles.button} onPress={handleDownload}>
+      <Text style={styles.buttonTitle}>Tải xuống chứng chỉ</Text>
+      <Image
+        source={require('../design/image/Circle.png')}
+        style={styles.buttonImage}
+      />
+    </TouchableOpacity>
+  );
 };
 
 export default CertScreen;
- 
