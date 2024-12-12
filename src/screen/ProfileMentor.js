@@ -1,12 +1,12 @@
 import {
-  StyleSheet,
+
   Text,
   View,
   Image,
-  FlatList,
+ 
   ActivityIndicator,
   TouchableOpacity,
-  Alert,
+
 } from 'react-native';
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
@@ -14,11 +14,13 @@ import { useRoute, useNavigation } from '@react-navigation/native';
 import BASE_URL from '../component/apiConfig';
 import styles from '../styles/ProfileMentorStyles';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+
+import BodyProfileMentor from '../component/BodyProfileMentor';
 const ProfileMentor = () => {
   const route = useRoute();
   const navigation = useNavigation();
   const { _id, userID } = route.params;
-  
+  // console.log('Teacher id :', _id , userID );
   const [mentor, setMentor] = useState(null);
   const [followerCount, setFollowerCount] = useState(null);
   const [feedbackCount, setFeedbackCount] = useState(0);
@@ -28,9 +30,9 @@ const ProfileMentor = () => {
   const [courseCount, setCourseCount] = useState(0);
   const [noCoursesMessage, setNoCoursesMessage] = useState("");
   const [isFollowing, setIsFollowing] = useState(false);
-//  console.log("dữ liệu nhận : ",  _id, userID )
+
   useEffect(() => {
-    // Load follow status from AsyncStorage when screen loads
+    // Tải trạng thái theo dõi từ AsyncStorage khi tải màn hình
     const loadFollowStatus = async () => {
       try {
         const followStatus = await AsyncStorage.getItem(`followStatus_${_id}`);
@@ -53,10 +55,6 @@ const ProfileMentor = () => {
           axios.get(`${BASE_URL}/course/countByTeacherID/${_id}`)
         ]);
 
-        console.log('Mentor Response:', mentorResponse.data);
-        console.log('Follower Response:', followerResponse.data);
-        console.log('Course Count Response:', courseCountResponse.data); // Log cái này
-
         setMentor(mentorResponse.data);
         setFollowerCount(followerResponse.data.followerCount);
         setCourseCount(courseCountResponse.data.count.courseCount);
@@ -78,127 +76,39 @@ const ProfileMentor = () => {
   }, [_id, userID]);
 
   const handleFollow = async () => {
-    if (isFollowing) {
-      Alert.alert("Thông báo", "Bạn đã theo dõi giảng viên này rồi!");
-      return;
-    }
+    if (isFollowing) return;
 
     try {
       const response = await axios.post(`${BASE_URL}/followTeacher/follow/${userID}`, {
         teacherID: _id,
       });
       if (response.data.message === "Theo dõi thành công") {
-
         setFollowerCount(prevCount => prevCount + 1);
         setIsFollowing(true);
-
-        // Save follow status to AsyncStorage
         await AsyncStorage.setItem(`followStatus_${_id}`, JSON.stringify(true));
       }
     } catch (error) {
       console.error('Error following mentor:', error);
-      Alert.alert("Lỗi", "Đã xảy ra lỗi khi theo dõi.");
     }
   };
 
   const handleUnfollow = async () => {
-    if (!isFollowing) {
-      Alert.alert("Thông báo", "Bạn chưa theo dõi giảng viên này!");
-      return;
-    }
+    if (!isFollowing) return;
 
     try {
       const response = await axios.post(`${BASE_URL}/followTeacher/unfollow/${userID}`, {
         teacherID: _id,
       });
       if (response.data.message === "Xóa theo dõi thành công") {
-
         setFollowerCount(prevCount => prevCount - 1);
         setIsFollowing(false);
-
-        // Remove follow status from AsyncStorage
         await AsyncStorage.setItem(`followStatus_${_id}`, JSON.stringify(false));
       }
     } catch (error) {
       console.error('Error unfollowing mentor:', error);
-      Alert.alert("Lỗi", "Đã xảy ra lỗi khi hủy theo dõi.");
     }
   };
 
-
-  // xem khóa học hoặc xem thông tin người dùng đánh giá
-  useEffect(() => {
-    const fetchContent = async () => {
-      setLoading(true);
-      setNoCoursesMessage("");
-
-      try {
-        const response = isCourses
-          ? await axios.get(`${BASE_URL}/course/getCourseByTeacherID/${_id}`)
-          : await axios.get(`${BASE_URL}/feedbackCourse/getAll`);
-
-        if (isCourses) {
-          // Xử lý dữ liệu khóa học
-          const courseData = response.data.length
-            ? response.data.map(course => ({
-              id: course._id,
-              image: { uri: course.img },
-              nameCourse: course.name,
-              nameLesson: course.describe,
-              quiz: `${new Intl.NumberFormat('vi-VN').format(course.price)} VNĐ`, // Định dạng tiền VNĐ
-              rate: '0 đánh giá',
-              student: '0 học viên',
-            }))
-            : [];
-
-          setData(courseData);
-          if (!courseData.length) {
-            setNoCoursesMessage("Chưa có khóa học nào");
-          }
-        } else {
-          // Xử lý dữ liệu phản hồi
-          const feedbackData = await Promise.all(
-            response.data.flatMap(course =>
-              course.feedbacks.map(async feedback => {
-                const user = feedback.userID || { _id: 'no user', name: 'No user' }; // Dữ liệu mặc định nếu không có userID
-                let userAvatar = null;
-
-                if (user._id !== 'no user') {
-                  try {
-                    const userResponse = await axios.get(`${BASE_URL}/user/getUserByID/${user._id}`);
-                    userAvatar = userResponse.data?.avatar || null; // Lấy avatar từ API
-                  } catch (userError) {
-                    console.warn('Lỗi khi lấy thông tin user:', userError);
-                  }
-                }
-
-                return {
-                  id: feedback._id,
-                  name: user.name, // Hiển thị tên từ userID
-                  img: userAvatar ? { uri: userAvatar } : null, // Avatar hoặc null nếu không có
-                  rating: feedback.feedbackDetail?.rating || 0,
-                  comment: feedback.feedbackDetail?.content || 'No comment',
-                  love: '0',
-                  createdAt: feedback.feedbackDetail
-                    ? new Date(feedback.feedbackDetail.createdAt).toLocaleDateString()
-                    : 'Unknown date',
-                };
-              })
-            )
-          );
-
-          setData(feedbackData);
-          setFeedbackCount(feedbackData.length);
-        }
-      } catch (error) {
-        console.error('Lỗi khi lấy nội dung:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchContent();
-  }, [isCourses, _id]);
 
 
 
@@ -207,8 +117,12 @@ const ProfileMentor = () => {
   };
 
   const handleAddReview = () => {
-    navigation.navigate('ReviewScreen');
+    const teacherID = _id;
+
+    navigation.navigate('ReviewScreen', { teacherID, userID });
+    console.log('đi :', teacherID, userID)
   };
+
 
   const handleButtonPress = isCoursesButton => {
     setIsCourses(isCoursesButton);
@@ -219,9 +133,9 @@ const ProfileMentor = () => {
     const receiverId = teacherID; // Gán _id của teacher làm receiverId
     const senderName = mentor.name; // Lấy name của giáo viên
     const timestamp = new Date().toISOString(); // Lấy thời gian hiện tại
-  
+
     console.log('Data:', { receiverId, userID, senderName, timestamp });
-  
+
     // Điều hướng đến màn hình BoxMess với các tham số
     navigation.navigate('BoxChat', {
       receiverId,
@@ -230,56 +144,101 @@ const ProfileMentor = () => {
       timestamp,
     });
   };
+
+  // fetch dữ liệu khóa học và đánh giá
+  useEffect(() => {
+   
+    const fetchCourses = async () => {
+      const response = await axios.get(`${BASE_URL}/course/getCourseByTeacherID/${_id}`);
+      //map lại để định dạng lại dữ liệu hoặc trả về mảng rỗng
+      const courseData = response.data.length
+        ? response.data.map(course => ({
+            id: course._id,
+            image: { uri: course.img },
+            nameCourse: course.name,
+            nameLesson: course.describe,
+            quiz: `${new Intl.NumberFormat('vi-VN').format(course.price)} VNĐ`,
+            createdAt: course.createdAt,
+          }))
+        : [];
   
-
-  const renderItem = ({ item }) => (
-    <View style={styles.detailItem}>
-      {isCourses ? (
-        <>
-          <Image source={item.image || require('../design/image/noprofile.png')} style={styles.detailImage} />
-          <View style={styles.detailContent}>
-            <Text style={styles.detailNameCourse}>{item.nameCourse}</Text>
-            <Text style={styles.detailNameLesson} numberOfLines={1} ellipsizeMode="tail">
-              {item.nameLesson}
-            </Text>
-            <Text style={styles.detailQuiz}>{item.quiz}</Text>
-            <View style={styles.rate_container}>
-              <Text style={styles.detailRate}>{item.rate}</Text>
-              <Text style={styles.detailRate}>|</Text>
-              <Text style={styles.detailStudent}>{item.student}</Text>
-            </View>
-          </View>
-        </>
-      ) : (
-        <>
-          <Image
-            source={item.img ? item.img : require('../design/image/noprofile.png')}
-            style={styles.avatarUser}
-          />
-          <View style={styles.voteContent}>
-            <View style={styles.user}>
-              <Text
-                style={styles.nameUser}
-                numberOfLines={1}
-                ellipsizeMode="tail">
-                {item.name}
-              </Text>
-              <View style={styles.viewrate}>
-                <Text style={styles.voteRate}>⭐</Text>
-                <Text style={styles.voteRate}>{item.rating}</Text>
-              </View>
-            </View>
-            <Text style={styles.voteComment}>{item.comment}</Text>
-            <View style={styles.voteInfo}>
-              <Text style={styles.voteLove}>❤️ {item.love}</Text>
-              <Text style={styles.voteDay}>{item.createdAt}</Text>
-            </View>
-          </View>
-        </>
-      )}
-    </View>
-  );
-
+      // Sắp xếp 
+      courseData.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+  
+      setData(courseData); // Cập nhật dữ liệu  vào state
+      // Nếu không có khóa học
+      if (!courseData.length) setNoCoursesMessage("Chưa có khóa học nào");
+    };
+  
+    // Hàm lấy danh sách đánh giá từ API
+    const fetchFeedback = async () => {
+      const response = await axios.get(`${BASE_URL}/feedbackTeacher/getFeedbackByTeacherID/${_id}`);
+     
+      const feedbackData = response.data.length
+        ? await Promise.all(
+            response.data.map(async feedback => {
+              let userAvatar = feedback.userID?.avatar;
+  
+              // Nếu không có avatar, lấy avatar từapi get userByID
+              if (!userAvatar && feedback.userID?._id) {
+                try {
+                  const userResponse = await axios.get(`${BASE_URL}/user/getUserByID/${feedback.userID._id}`);
+                  userAvatar = userResponse.data?.avatar;
+                } catch (userError) {
+                  // Xử lý lỗi nếu cần
+                }
+              }
+  
+              // Nếu không có avatar, dùng ảnh mặc định
+              const avatarImage = userAvatar ? { uri: userAvatar } : require('../design/image/noprofile.png');
+  
+              return {
+                id: feedback._id,
+                name: feedback.userID?.name || "Không có tên người dùng",
+                img: avatarImage,
+                rating: feedback.feedbackDetail?.rating || 0,
+                comment: feedback.feedbackDetail?.content || "Không có nhận xét",
+                love: '0',
+                createdAt: feedback.feedbackDetail
+                  ? new Date(feedback.feedbackDetail.createdAt).toLocaleDateString()
+                  : 'Ngày không xác định',
+              };
+            })
+          )
+        : [];
+  
+      // Sắp xếp đánh giá theo ngày tạo, mới nhất ở trên cùng
+      feedbackData.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+  
+      setData(feedbackData);
+      setFeedbackCount(feedbackData.length); 
+   
+      if (!feedbackData.length) setNoCoursesMessage("Không có đánh giá nào");
+    };
+  
+    // Hàm chung để gọi hàm lấy dữ liệu, có thể là khóa học hoặc đánh giá
+    const fetchContent = async () => {
+      setLoading(true); 
+      setNoCoursesMessage("");
+  
+      try {
+        if (isCourses) {
+          await fetchCourses();
+        } else {
+          await fetchFeedback(); 
+        }
+      } catch (error) {
+        setData([]); 
+        setNoCoursesMessage("Không có đánh giá nào"); 
+      } finally {
+        setLoading(false); 
+      }
+    };
+  
+    // Gọi hàm fetchContent để thực hiện tải dữ liệu
+    fetchContent();
+  }, [isCourses, _id]); // Hook phụ thuộc vào biến isCourses và _id
+  
   if (loading) {
     return (
       <View style={styles.container}>
@@ -344,37 +303,17 @@ const ProfileMentor = () => {
         </TouchableOpacity>
 
         {/* nút nhắn tin  */}
-        <TouchableOpacity style={styles.btn_mess} onPress={() => handleBoxMess(userID, _id,mentor)}>
+        <TouchableOpacity style={styles.btn_mess} onPress={() => handleBoxMess(userID, _id, mentor)}>
           <Text style={styles.txt_mess}>Nhắn tin</Text>
         </TouchableOpacity>
 
       </View>
-      <View style={styles.body}>
-        <View style={styles.btnrate_container}>
-          <TouchableOpacity
-            onPress={() => handleButtonPress(true)}
-            style={[styles.btn, isCourses && styles.btnActive]}>
-            <Text style={[styles.txtActive, !isCourses && styles.txtInactive]}>
-              Khóa học
-            </Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            onPress={() => handleButtonPress(false)}
-            style={[styles.btn, !isCourses && styles.btnActive]}>
-            <Text style={[styles.txtActive, isCourses && styles.txtInactive]}>
-              Đánh giá
-            </Text>
-          </TouchableOpacity>
-        </View>
-        <FlatList
-          data={data}
-          renderItem={renderItem}
-          keyExtractor={item => item.id}
-          contentContainerStyle={styles.flatList}
-          style={{ width: '99%', margin: 10 }}
-          ListEmptyComponent={<Text style={styles.emptyMessage}>{noCoursesMessage}</Text>}
-        />
-      </View>
+      <BodyProfileMentor
+        isCourses={isCourses}
+        data={data}
+        noCoursesMessage={noCoursesMessage}
+        handleButtonPress={handleButtonPress}
+      />
       {/* Floating Button */}
       {!isCourses && (
         <TouchableOpacity

@@ -34,7 +34,8 @@ const styles = StyleSheet.create({
     },
     voteContent: {
       flex: 1,
-      paddingVertical: 20,
+      paddingVertical: 10,
+      marginLeft : 10
   
     },
     voteRate: {
@@ -46,8 +47,8 @@ const styles = StyleSheet.create({
       flexDirection: 'row',
       justifyContent: 'space-between',
       alignItems: 'center',
-      marginVertical: 5,
-      marginHorizontal: 15,
+    
+
     },
     viewrate: {
       flexDirection: 'row',
@@ -59,18 +60,19 @@ const styles = StyleSheet.create({
       backgroundColor: '#E8F1FF',
       alignItems: 'center',
       justifyContent: 'space-evenly',
+      marginRight : 20
     },
     nameUser: {
       fontFamily: 'Mulish-ExtraBold',
-      fontSize: 20,
+      fontSize: 15,
       color: 'black',
       width: '70%',
     },
     voteComment: {
-      fontFamily: 'Mulish-ExtraBold',
-      fontSize: 16,
+      fontFamily: 'Mulish-Bold',
+      fontSize: 15,
       color: '#545454',
-      marginVertical: 10,
+ 
     },
     voteInfo: {
       flexDirection: 'row',
@@ -117,8 +119,8 @@ const styles = StyleSheet.create({
       elevation: 3,
     },
     detailImage: {
-      width: 140,
-      height: 140,
+      width: 100,
+      height: 100,
       borderTopLeftRadius: 10,
       borderBottomLeftRadius: 10,
       marginRight: 15,
@@ -128,13 +130,13 @@ const styles = StyleSheet.create({
     },
     detailNameCourse: {
       fontFamily: 'Mulish-Bold',
-      fontSize: 13,
+      fontSize: 14,
       color: '#FF6B00',
       marginBottom: 5,
     },
     detailNameLesson: {
       fontFamily: 'Mulish-ExtraBold',
-      fontSize: 16,
+      fontSize: 12,
       color: '#202244',
       marginBottom: 5,
       width: '90%',

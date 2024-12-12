@@ -1,7 +1,12 @@
 import { StyleSheet } from 'react-native'; 
 const styles = StyleSheet.create({
 
-
+  emptyReviewText: {
+    textAlign: 'center',
+    color: '#777',
+    fontSize: 16,
+    marginTop: 20,
+  },
 
   
     ViewAll: {  
@@ -31,6 +36,7 @@ const styles = StyleSheet.create({
       alignItems: 'center',
       justifyContent: 'center',
       marginLeft: 10,
+      
     },
     count_numberText: {
       color: '#191B28',
@@ -46,7 +52,7 @@ const styles = StyleSheet.create({
       flexDirection: 'row',
       alignItems: 'center',
       justifyContent: 'flex-start',
-      marginTop: 20,
+     marginBottom : 10
     },
     input: {
       height: 120,
@@ -124,7 +130,7 @@ const styles = StyleSheet.create({
       marginBottom: 10,
       borderWidth : 1,
       borderColor :'#99A1CE',
-      marginTop : 5
+
     },
     reviewText: {
       fontSize: 18,
@@ -135,7 +141,7 @@ const styles = StyleSheet.create({
       fontFamily: 'Mulish-Regular',
       fontSize: 16,
       color: '#242424',
-      marginVertical: 20,
+      marginVertical: 10,
     },
     reviewTime: {
       fontSize: 15,
