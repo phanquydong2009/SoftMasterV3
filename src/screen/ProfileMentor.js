@@ -118,7 +118,7 @@ const ProfileMentor = () => {
   };
 
 
-// ddi sang màn đánh giá
+  // ddi sang màn đánh giá
   const handleAddReview = async () => {
     // Kiểm tra đã theo dõi giảng viên chưa
     if (!isFollowing) {
@@ -145,6 +145,12 @@ const ProfileMentor = () => {
 
   //  đến màn nhắn tin 
   const handleBoxMess = (userID, teacherID, mentor) => {
+    // Kiểm tra đã theo dõi giảng viên chưa
+    if (!isFollowing) {
+      // Mở modal khi người dùng chưa theo dõi giảng viên
+      setModalVisible(true);
+      return;
+    }
     const receiverId = teacherID; // Gán _id của teacher làm receiverId
     const senderName = mentor.name; // Lấy name của giáo viên
     const timestamp = new Date().toISOString(); // Lấy thời gian hiện tại
@@ -342,23 +348,23 @@ const ProfileMentor = () => {
       )}
       {/* Modal thông báo lỗi */}
       <Modal
-      isVisible={modalVisible} // Kiểm tra trạng thái của modal
-      onBackdropPress={closeModal} // Đóng modal khi nhấn ra ngoài
-      backdropColor="rgba(0, 0, 0, 0.5)" // Màu nền của backdrop
-      backdropOpacity={0.5} // Độ mờ của nền
-    >
-      <View style={styles.modalContainer}>
-   
-        <Image
-          source={require('../design/image/fl.png')} 
-          style={styles.image}
-        />
-        <Text style={styles.modalTitle}>
-        Bạn cần theo dõi giảng viên để có thể xem và đánh giá.
-        </Text>
-        <Button title="Đóng" onPress={closeModal} color="#0961F5"  />
-      </View>
-    </Modal>
+        isVisible={modalVisible} // Kiểm tra trạng thái của modal
+        onBackdropPress={closeModal} // Đóng modal khi nhấn ra ngoài
+        backdropColor="rgba(0, 0, 0, 0.5)" // Màu nền của backdrop
+        backdropOpacity={0.5} // Độ mờ của nền
+      >
+        <View style={styles.modalContainer}>
+
+          <Image
+            source={require('../design/image/fl.png')}
+            style={styles.image}
+          />
+          <Text style={styles.modalTitle}>
+            Để nhắn tin hoặc đánh giá giảng viên này, bạn cần theo dõi họ trước.
+          </Text>
+          <Button title="Đóng" onPress={closeModal} color="#0961F5" />
+        </View>
+      </Modal>
     </View>
 
   );
