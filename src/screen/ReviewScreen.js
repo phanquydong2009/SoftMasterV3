@@ -5,31 +5,30 @@ import Modal from 'react-native-modal';
 import styles from '../styles/ReviewScreenStyles';
 import BASE_URL from '../component/apiConfig';
 import axios from 'axios';
+
 const ReviewScreen = () => {
   const navigation = useNavigation();
   const route = useRoute();
   const { teacherID, userID } = route.params;
-  // console.log('nhận : ', teacherID, userID);
 
   const [selectedStars, setSelectedStars] = useState(0);
   const [comment, setComment] = useState('');
   const [reviews, setReviews] = useState([]);
-  const [isModalVisible, setModalVisible] = useState(false);
+  const [isModalVisible, setModalVisible] = useState(false); // Success Modal
   const [isErrorModalVisible, setErrorModalVisible] = useState(false);
   const [showAllReviews, setShowAllReviews] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
-  //sửa đánh giá 
+
   const [editReviewID, setEditReviewID] = useState(null);
   const [editSelectedStars, setEditSelectedStars] = useState(0);
   const [editComment, setEditComment] = useState('');
 
+  const [isEditModalVisible, setEditModalVisible] = useState(false); // Edit Review Modal
 
-  // fetch dữ liệu đánh giá của GV
   useEffect(() => {
     fetch(`${BASE_URL}/feedbackTeacher/getFeedbackByTeacherID/${teacherID}`)
       .then((response) => response.json())
       .then((data) => {
-        // console.log('Dữ liệu phản hồi từ API:', data);
         if (Array.isArray(data)) {
           const sortedReviews = data.map((item) => ({
             stars: item.feedbackDetail.rating,
@@ -44,11 +43,9 @@ const ReviewScreen = () => {
         }
       })
       .catch((error) => {
-        // console.error('Lỗi khi lấy dữ liệu phản hồi:', error);
         setReviews([]);
       });
   }, [teacherID]);
-
 
   const handleBack = () => {
     navigation.goBack();
@@ -59,41 +56,23 @@ const ReviewScreen = () => {
   };
 
   const handleSubmitReview = () => {
-    // Kiểm tra xem người dùng đã chọn sao và nhập bình luận chưa
     if (selectedStars === 0 || comment.trim() === '') {
       setErrorMessage('Vui lòng chọn sao và nhập đánh giá của bạn!');
       setErrorModalVisible(true);
       return;
     }
 
-    // Kiểm tra xem người dùng đã đánh giá giảng viên này chưa
     const isAlreadyReviewed = reviews.some(review => review.username === 'Người dùng ' && review.teacherID === teacherID);
 
     if (isAlreadyReviewed) {
-      // Nếu đã đánh giá giảng viên này rồi, hiển thị thông báo lỗi và không tạo newReview
       setErrorMessage('Bạn đã đánh giá giảng viên này rồi!');
       setErrorModalVisible(true);
       return;
     }
 
-    // Tạo dữ liệu đánh giá mới để thêm vào danh sách tạm thời
-    const newReview = {
-      stars: selectedStars,
-      comment: comment,
-      timestamp: new Date(),
-      username: 'Bạn vừa đánh giá',
-      teacherID: teacherID,
-    };
-
-    // Thêm đánh giá mới vào đầu danh sách các đánh giá
-    setReviews([newReview, ...reviews]);
-
-    // Gửi yêu cầu POST lên API để lưu đánh giá
     fetch(`${BASE_URL}/feedbackTeacher/feedback/${userID}/${teacherID}`, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         rating: selectedStars,
         content: comment,
@@ -106,24 +85,65 @@ const ReviewScreen = () => {
         return response.json();
       })
       .then((data) => {
-        console.log('Đánh giá đã được gửi:', data);
-        setModalVisible(true); // Hiển thị modal thành công
+        setModalVisible(true);  // Show success modal
+        const newReview = {
+          stars: selectedStars,
+          comment: comment,
+          timestamp: new Date(),
+          username: 'Bạn vừa đánh giá',
+          teacherID: teacherID,
+        };
+        setReviews([newReview, ...reviews]);
+        setSelectedStars(0);
+        setComment('');
+        setEditReviewID(null);
+        setEditSelectedStars(0);
+        setEditComment('');
       })
       .catch((error) => {
-        // Xử lý lỗi khi gửi đánh giá
-        if (error.message === 'ErrorSendingReview') {
-          setErrorMessage('Đã xảy ra lỗi khi gửi đánh giá. Vui lòng thử lại sau!');
-        } else {
-          setErrorMessage('Đã xảy ra lỗi không xác định!');
-        }
-        setErrorModalVisible(true); // Hiển thị modal lỗi
+        setErrorMessage('Bạn đã đánh giá giảng viên này trước đó !');
+        setErrorModalVisible(true);
       });
-
-    // Reset các trường nhập liệu sau khi gửi đánh giá
-    setSelectedStars(0); // Đặt lại số sao đã chọn
-    setComment(''); // Đặt lại nội dung bình luận
   };
 
+  const handleEditReview = (item) => {
+    setEditReviewID(item.userID);
+    setEditSelectedStars(item.stars);
+    setEditComment(item.comment);
+    setEditModalVisible(true); // Show edit review modal
+  };
+
+  const handleUpdateReview = async () => {
+    if (editSelectedStars === 0 || editComment.trim() === '') {
+      setErrorMessage('Vui lòng chọn sao và nhập đánh giá của bạn!');
+      setErrorModalVisible(true);
+      return;
+    }
+
+    try {
+      const response = await axios.put(`${BASE_URL}/feedbackTeacher/update/${userID}/${teacherID}`, {
+        rating: editSelectedStars,
+        content: editComment,
+      });
+
+      if (response.status === 200) {
+        const updatedReviews = reviews.map((review) =>
+          review.userID === editReviewID
+            ? { ...review, stars: editSelectedStars, comment: editComment }
+            : review
+        );
+        setReviews(updatedReviews);
+        setEditModalVisible(false); // Close edit modal
+      } else {
+        setErrorMessage('Cập nhật thất bại. Vui lòng thử lại!');
+        setErrorModalVisible(true);
+      }
+    } catch (error) {
+      console.error('Lỗi khi cập nhật đánh giá:', error);
+      setErrorMessage('Có lỗi xảy ra khi cập nhật đánh giá!');
+      setErrorModalVisible(true);
+    }
+  };
   //xóa dánh giá 
   const handleDeleteReview = async (reviewID) => {
     try {
@@ -147,49 +167,13 @@ const ReviewScreen = () => {
       console.error("Lỗi khi xóa đánh giá: ", error.message);
     }
   };
-  // chỉnh sửa 
-  const handleEditReview = (item) => {
-    setEditReviewID(item.userID);
-    setEditSelectedStars(item.stars);
-    setEditComment(item.comment);
-    setModalVisible(true); // mở popup chỉnh sửa
+  const handleHome = () => {
+    setModalVisible(false); // Close success modal
   };
 
-  const handleUpdateReview = async () => {
-    if (editSelectedStars === 0 || editComment.trim() === '') {
-      setErrorMessage('Vui lòng chọn sao và nhập đánh giá của bạn!');
-      setErrorModalVisible(true);
-      return;
-    }
-
-    try {
-      const response = await axios.put(`${BASE_URL}/feedbackTeacher/update/${userID}/${teacherID}`, {
-        rating: editSelectedStars,
-        content: editComment,
-      });
-
-      if (response.status === 200) {
-        // Find the review to update
-        const updatedReviews = reviews.map((review) =>
-          review.userID === editReviewID
-            ? { ...review, stars: editSelectedStars, comment: editComment }
-            : review
-        );
-
-        // Update state
-        setReviews(updatedReviews);
-        setModalVisible(false); // Close the modal
-      } else {
-        setErrorMessage('Cập nhật thất bại. Vui lòng thử lại!');
-        setErrorModalVisible(true);
-      }
-    } catch (error) {
-      console.error('Lỗi khi cập nhật đánh giá:', error);
-      setErrorMessage('Có lỗi xảy ra khi cập nhật đánh giá!');
-      setErrorModalVisible(true);
-    }
+  const closeErrorModal = () => {
+    setErrorModalVisible(false);
   };
-
   const getElapsedTime = (timestamp) => {
     const now = new Date();
     const seconds = Math.floor((now - timestamp) / 1000);
@@ -201,22 +185,6 @@ const ReviewScreen = () => {
     if (hours < 24) return `${hours} giờ trước`;
     const days = Math.floor(hours / 24);
     return `${days} ngày trước`;
-  };
-
-  const closeModal = () => {
-    setModalVisible(false);
-  };
-
-  const closeErrorModal = () => {
-    setErrorModalVisible(false);
-  };
-
-  const handleHome = () => {
-    closeModal();
-  };
-
-  const handleViewAllReviews = () => {
-    setShowAllReviews(true);
   };
 
   const reviewsToShow = showAllReviews ? reviews : reviews.slice(0, 2);
@@ -267,66 +235,63 @@ const ReviewScreen = () => {
         </View>
       </View>
 
-      {/* FlatList */}
       <FlatList
         data={reviewsToShow}
         keyExtractor={(item, index) => index.toString()}
-        renderItem={({ item }) => {
-          return (
-            <View style={styles.reviewItem}>
-              <Text style={styles.reviewText}>
-                {item.username} {'⭐'.repeat(item.stars)}
-              </Text>
-              <Text style={styles.reviewComment}>{item.comment}</Text>
-              <View style={styles.rowAction}>
-                <Text style={styles.reviewTime}>{getElapsedTime(item.timestamp)}</Text>
-                {item.userID === userID && (
-                  <TouchableOpacity onPress={() => handleEditReview(item)}>
-                    <Text style={{ color: 'blue',marginLeft : 120 ,fontFamily: 'Mulish-Bold' }}>Chỉnh Sửa</Text>
-                  </TouchableOpacity>
-                )}
-                {item.userID === userID && (
-                  <TouchableOpacity onPress={() => handleDeleteReview(item.userID)}>
-                    <Text style={{ color: 'red', fontFamily: 'Mulish-Bold' }}>Xóa</Text>
-                  </TouchableOpacity>
-                )}
-              </View>
+        renderItem={({ item }) => (
+          <View style={styles.reviewItem}>
+            <Text style={styles.reviewText}>
+              {item.username} {'⭐'.repeat(item.stars)}
+            </Text>
+            <Text style={styles.reviewComment}>{item.comment}</Text>
+            <View style={styles.rowAction}>
+              <Text style={styles.reviewTime}>{getElapsedTime(item.timestamp)}</Text>
+              {item.userID === userID && (
+                <TouchableOpacity onPress={() => handleEditReview(item)}>
+                  <Text style={{ color: 'blue', marginLeft: 120, fontFamily: 'Mulish-Bold' }}>Chỉnh Sửa</Text>
+                </TouchableOpacity>
+              )}
+              {item.userID === userID && (
+                <TouchableOpacity onPress={() => handleDeleteReview(item.userID)}>
+                  <Text style={{ color: 'red', fontFamily: 'Mulish-Bold' }}>Xóa</Text>
+                </TouchableOpacity>
+              )}
             </View>
-          );
-        }}
+          </View>
+        )}
         ListEmptyComponent={<Text style={styles.emptyReviewText}>Chưa có đánh giá nào</Text>}
       />
 
-
-
-
-      <Modal isVisible={isModalVisible} onBackdropPress={closeModal} style={styles.modal}>
+      {/* Success Modal */}
+      <Modal isVisible={isModalVisible} onBackdropPress={() => setModalVisible(false)} style={styles.modal}>
         <View style={styles.modalContent}>
           <Image source={require('../design/image/done.png')} />
           <Text style={styles.modalTitle}>Xin cảm ơn bạn !</Text>
           <Text style={styles.modalMessage}>Bạn đã gửi đánh giá thành công !</Text>
           <TouchableOpacity onPress={handleHome} style={styles.modalButton}>
-            <Text style={styles.modalButtonText}>Đóng</Text>
+            <Text style={styles.modalButtonText}>Về trang chủ</Text>
           </TouchableOpacity>
         </View>
       </Modal>
 
-      <Modal isVisible={isErrorModalVisible} onBackdropPress={closeErrorModal} style={styles.errorModal}>
-        <View style={styles.modalContent}>
-          <Image source={require('../design/image/error.png')} />
-          <Text style={styles.modalTitle}>Đánh giá thất bại</Text>
-          <Text style={styles.modalMessage}>{errorMessage}</Text>
-          <TouchableOpacity onPress={closeErrorModal} style={styles.modalButton}>
-            <Text style={styles.modalButtonText}>Đóng</Text>
+
+      {/* Error Modal */}
+      <Modal isVisible={isErrorModalVisible} onBackdropPress={closeErrorModal}>
+        <View style={styles.errorModal}>
+          <Text>{errorMessage}</Text>
+          <TouchableOpacity onPress={closeErrorModal}>
+            <Text>OK</Text>
           </TouchableOpacity>
         </View>
       </Modal>
-      <Modal isVisible={isModalVisible} onBackdropPress={closeModal} style={styles.modal}>
+
+      {/* Modal for Editing Review */}
+      <Modal isVisible={isEditModalVisible} onBackdropPress={() => setEditModalVisible(false)}>
         <View style={styles.modalContent}>
           <Text style={styles.modalTitle}>Chỉnh sửa đánh giá</Text>
           <View style={styles.rate_container}>
             {[...Array(5)].map((_, index) => (
-              <TouchableOpacity key={index} onPress={() => setEditSelectedStars(index + 1)}>
+              <TouchableOpacity key={index} onPress={() => handleStarPress(index)}>
                 <Image
                   source={
                     editSelectedStars > index
@@ -339,17 +304,18 @@ const ReviewScreen = () => {
             ))}
           </View>
           <TextInput
-            placeholder="Viết đánh giá của bạn"
+            placeholder="Chỉnh sửa đánh giá của bạn"
             style={styles.input}
             multiline={true}
             value={editComment}
             onChangeText={setEditComment}
           />
-          <TouchableOpacity onPress={handleUpdateReview} style={styles.submitButton}>
+          <TouchableOpacity style={styles.submitButton} onPress={handleUpdateReview}>
             <Text style={styles.submitText}>Cập nhật đánh giá</Text>
           </TouchableOpacity>
         </View>
       </Modal>
+
 
     </View>
   );

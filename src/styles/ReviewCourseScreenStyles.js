@@ -2,6 +2,12 @@ import { StyleSheet } from 'react-native';
 
 
 const styles = StyleSheet.create({
+  action :{
+    flexDirection:'row',
+    justifyContent :"space-between",
+    alignItems :"center",
+
+  },
   modalContainer: {
     flex: 1,
     justifyContent: 'center',
@@ -89,9 +95,9 @@ const styles = StyleSheet.create({
   },
   txtTime: {
     color: '#808080',
-    fontSize: 15,
+
     fontFamily: 'Mulish-Bold',
-    marginTop: 15,
+    marginTop: 5,
   },
 
   txtRate: {
