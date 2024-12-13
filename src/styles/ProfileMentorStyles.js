@@ -2,6 +2,15 @@ import { StyleSheet } from 'react-native';
 
 
 const styles = StyleSheet.create({
+  //btn deletee 
+  btnDelete :{
+    position :'absolute',
+    right : 15
+  },
+  txtDelete : {
+    fontFamily : 'Mulish-Bold',
+    color :"red"
+  },
   // popup
   modalContainer: {
     backgroundColor: 'white',
@@ -106,6 +115,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'flex-start',
     alignItems: 'center',
+    marginVertical : 5
   },
   voteLove: {
     fontFamily: 'Mulish-Bold',

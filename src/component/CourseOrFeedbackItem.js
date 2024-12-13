@@ -44,9 +44,8 @@ const CourseOrFeedbackItem = ({ item, isCourses }) => {
               <View style={styles.voteInfo}>
                 <Text style={styles.voteLove}>❤️ {item.love}</Text>
                 <Text style={styles.voteDay}>{item.createdAt}</Text>
-                {/* <TouchableOpacity style={{ width: 35, height: 35, marginLeft: 100 }}>
-                  <Image source={require('../design/image/ic_delete.png')} style={{ width: 30, height: 30 }} />
-
+                {/* <TouchableOpacity style={styles.btnDelete}> 
+                  <Text style={styles.txtDelete}>Xóa</Text>
                 </TouchableOpacity> */}
               </View>
 

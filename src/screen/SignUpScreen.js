@@ -11,14 +11,14 @@ const SignUpScreen = () => {
   const [confirmPasswordVisible, setConfirmPasswordVisible] = useState(false);
   const [email, setEmail] = useState('');
   const [name, setName] = useState('');
-  const [phone, setPhone] = useState(''); // State for phone number
+  const [phone, setPhone] = useState(''); 
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [emailBorderColor, setEmailBorderColor] = useState('#CCCCCC');
   const [passwordBorderColor, setPasswordBorderColor] = useState('#CCCCCC');
   const [confirmPasswordBorderColor, setConfirmPasswordBorderColor] = useState('#CCCCCC');
   const [nameBorderColor, setNameBorderColor] = useState('#CCCCCC');
-  const [phoneBorderColor, setPhoneBorderColor] = useState('#CCCCCC'); // Border color for phone number
+  const [phoneBorderColor, setPhoneBorderColor] = useState('#CCCCCC');
   const [errorText, setErrorText] = useState('');
 
   // Format name with uppercase first letters

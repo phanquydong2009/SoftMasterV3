@@ -14,7 +14,7 @@ const SignInScreen = () => {
     const [isSwitchEnabled, setSwitchEnabled] = useState(false);
     const [passwordVisible, setPasswordVisible] = useState(false);
     const [email, setEmail] = useState('dongphanqui2@gmail.com');
-    const [password, setPassword] = useState('123456789');
+    const [password, setPassword] = useState('biimax2009');
     const [emailBorderColor, setEmailBorderColor] = useState('#CCCCCC');
     const [passwordBorderColor, setPasswordBorderColor] = useState('#CCCCCC');
     const [errorText, setErrorText] = useState('');

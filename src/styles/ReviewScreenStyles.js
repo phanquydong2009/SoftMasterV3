@@ -1,14 +1,18 @@
 import { StyleSheet } from 'react-native'; 
 const styles = StyleSheet.create({
 
+  // rowAction
+  rowAction : {
+    flexDirection :'row',
+    justifyContent :'space-between',
+    alignItems :"center"
+  },
   emptyReviewText: {
     textAlign: 'center',
     color: '#777',
     fontSize: 16,
     marginTop: 20,
   },
-
-  
     ViewAll: {  
       paddingBottom: 20, 
       alignItems: 'center', 
@@ -130,7 +134,6 @@ const styles = StyleSheet.create({
       marginBottom: 10,
       borderWidth : 1,
       borderColor :'#99A1CE',
-
     },
     reviewText: {
       fontSize: 18,
