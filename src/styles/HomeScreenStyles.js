@@ -48,7 +48,7 @@ const styles = StyleSheet.create({
         justifyContent: "space-between",
         alignItems: 'center',
         paddingRight: 10,
-        marginTop :10
+        marginTop: 10
     },
     mentorAvatar: {
         width: 70,
@@ -65,7 +65,7 @@ const styles = StyleSheet.create({
     mentorCard: {
         alignItems: 'center',
         marginVertical: 10,
-        width: 100, 
+        width: 100,
 
     },
     ic_bookmark: {
@@ -89,13 +89,13 @@ const styles = StyleSheet.create({
         overflow: 'hidden',
         marginRight: 10,
         width: 250,
-        height:230,
+        height: 230,
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 10 },
         shadowOpacity: 0.3,
         shadowRadius: 10,
         elevation: 5,
-    
+
 
     },
     cardImage: {
@@ -128,15 +128,15 @@ const styles = StyleSheet.create({
         marginHorizontal: 20
     },
     // 
-    ListSuject : {
-        marginVertical : 10
+    ListSuject: {
+        marginVertical: 10
     },
     popularCourses: {
         flexDirection: "row",
         justifyContent: "space-between",
         alignItems: 'center',
         paddingRight: 10,
-     marginTop : 10
+        marginVertical: 10
 
     },
     title: {
@@ -182,7 +182,7 @@ const styles = StyleSheet.create({
         flexDirection: "column",
         flex: 3,
     },
-    
+
     welcome_container: {
         flexDirection: "row",
     },
@@ -255,19 +255,19 @@ const styles = StyleSheet.create({
         borderRadius: 4,
         marginHorizontal: 4,
     },
-// styles search 
-searchContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#FFFFFF',
-    borderRadius: 15,
-    paddingHorizontal: 15,
-    height: 50,
-    marginTop: 20,
-    marginRight: 20,
-    // Shadow for Android
-    elevation: 5,
-},
+    // styles search 
+    searchContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        backgroundColor: '#FFFFFF',
+        borderRadius: 15,
+        paddingHorizontal: 15,
+        height: 50,
+        marginTop: 20,
+        marginRight: 20,
+        // Shadow for Android
+        elevation: 5,
+    },
 
     searchButton: {
         flexDirection: 'row',
@@ -275,11 +275,11 @@ searchContainer: {
         flex: 1,
         justifyContent: 'flex-start',
     },
-  
+
     textInput: {
         color: '#545454',
         fontSize: 16,
-        fontFamily: 'Arial', 
+        fontFamily: 'Arial',
     },
 });
 
