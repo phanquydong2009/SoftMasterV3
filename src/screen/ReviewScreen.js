@@ -14,7 +14,7 @@ const ReviewScreen = () => {
   const [selectedStars, setSelectedStars] = useState(0);
   const [comment, setComment] = useState('');
   const [reviews, setReviews] = useState([]);
-  const [isModalVisible, setModalVisible] = useState(false); // Success Modal
+  const [isModalVisible, setModalVisible] = useState(false);
   const [isErrorModalVisible, setErrorModalVisible] = useState(false);
   const [showAllReviews, setShowAllReviews] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
@@ -23,7 +23,7 @@ const ReviewScreen = () => {
   const [editSelectedStars, setEditSelectedStars] = useState(0);
   const [editComment, setEditComment] = useState('');
 
-  const [isEditModalVisible, setEditModalVisible] = useState(false); // Edit Review Modal
+  const [isEditModalVisible, setEditModalVisible] = useState(false);
 
   useEffect(() => {
     fetch(`${BASE_URL}/feedbackTeacher/getFeedbackByTeacherID/${teacherID}`)
@@ -46,6 +46,10 @@ const ReviewScreen = () => {
         setReviews([]);
       });
   }, [teacherID]);
+
+  const handleShowAllReviews = () => {
+    setShowAllReviews(!showAllReviews); // Toggle the showAllReviews state
+  };
 
   const handleBack = () => {
     navigation.goBack();
@@ -85,7 +89,8 @@ const ReviewScreen = () => {
         return response.json();
       })
       .then((data) => {
-        setModalVisible(true);  // Show success modal
+        setErrorModalVisible(false);  // Đóng modal lỗi nếu có
+        setModalVisible(true);  // Hiển thị modal thành công
         const newReview = {
           stars: selectedStars,
           comment: comment,
@@ -106,11 +111,12 @@ const ReviewScreen = () => {
       });
   };
 
+
   const handleEditReview = (item) => {
     setEditReviewID(item.userID);
     setEditSelectedStars(item.stars);
     setEditComment(item.comment);
-    setEditModalVisible(true); // Show edit review modal
+    setEditModalVisible(true);
   };
 
   const handleUpdateReview = async () => {
@@ -133,7 +139,8 @@ const ReviewScreen = () => {
             : review
         );
         setReviews(updatedReviews);
-        setEditModalVisible(false); // Close edit modal
+        setEditModalVisible(false); // Đóng modal chỉnh sửa
+        setErrorModalVisible(false); // Đảm bảo modal lỗi đóng khi thành công
       } else {
         setErrorMessage('Cập nhật thất bại. Vui lòng thử lại!');
         setErrorModalVisible(true);
@@ -144,6 +151,7 @@ const ReviewScreen = () => {
       setErrorModalVisible(true);
     }
   };
+
   //xóa dánh giá 
   const handleDeleteReview = async (reviewID) => {
     try {
@@ -167,13 +175,7 @@ const ReviewScreen = () => {
       console.error("Lỗi khi xóa đánh giá: ", error.message);
     }
   };
-  const handleHome = () => {
-    setModalVisible(false); // Close success modal
-  };
 
-  const closeErrorModal = () => {
-    setErrorModalVisible(false);
-  };
   const getElapsedTime = (timestamp) => {
     const now = new Date();
     const seconds = Math.floor((now - timestamp) / 1000);
@@ -187,7 +189,7 @@ const ReviewScreen = () => {
     return `${days} ngày trước`;
   };
 
-  const reviewsToShow = showAllReviews ? reviews : reviews.slice(0, 2);
+  const reviewsToShow = showAllReviews ? reviews : reviews.slice(0, 3);
 
   return (
     <View style={styles.container}>
@@ -233,6 +235,9 @@ const ReviewScreen = () => {
         <View style={styles.count_number}>
           <Text style={styles.count_numberText}>{reviews.length}</Text>
         </View>
+        <TouchableOpacity onPress={handleShowAllReviews}>
+          <Text style={styles.txtViewAll}>{showAllReviews ? 'Ẩn bớt' : 'Xem tất cả'}</Text>
+        </TouchableOpacity>
       </View>
 
       <FlatList
@@ -248,7 +253,7 @@ const ReviewScreen = () => {
               <Text style={styles.reviewTime}>{getElapsedTime(item.timestamp)}</Text>
               {item.userID === userID && (
                 <TouchableOpacity onPress={() => handleEditReview(item)}>
-                  <Text style={{ color: 'blue', marginLeft: 120, fontFamily: 'Mulish-Bold' }}>Chỉnh Sửa</Text>
+                  <Text style={{ color: '#0961F5', marginLeft: 120, fontFamily: 'Mulish-Bold' }}>Chỉnh Sửa</Text>
                 </TouchableOpacity>
               )}
               {item.userID === userID && (
@@ -262,36 +267,30 @@ const ReviewScreen = () => {
         ListEmptyComponent={<Text style={styles.emptyReviewText}>Chưa có đánh giá nào</Text>}
       />
 
-      {/* Success Modal */}
-      <Modal isVisible={isModalVisible} onBackdropPress={() => setModalVisible(false)} style={styles.modal}>
-        <View style={styles.modalContent}>
-          <Image source={require('../design/image/done.png')} />
-          <Text style={styles.modalTitle}>Xin cảm ơn bạn !</Text>
-          <Text style={styles.modalMessage}>Bạn đã gửi đánh giá thành công !</Text>
-          <TouchableOpacity onPress={handleHome} style={styles.modalButton}>
-            <Text style={styles.modalButtonText}>Về trang chủ</Text>
-          </TouchableOpacity>
-        </View>
-      </Modal>
+
+
+      {/* Done Modal */}
+      {isModalVisible && (
+        <Text style={styles.successText}>Bạn đã gửi đánh giá thành công!</Text>
+      )}
 
 
       {/* Error Modal */}
-      <Modal isVisible={isErrorModalVisible} onBackdropPress={closeErrorModal}>
-        <View style={styles.errorModal}>
-          <Text>{errorMessage}</Text>
-          <TouchableOpacity onPress={closeErrorModal}>
-            <Text>OK</Text>
-          </TouchableOpacity>
+      {isErrorModalVisible && (
+        <View style={styles.errorContainer}>
+          <Text style={styles.errorText}>{errorMessage}</Text>
         </View>
-      </Modal>
+      )}
+
 
       {/* Modal for Editing Review */}
       <Modal isVisible={isEditModalVisible} onBackdropPress={() => setEditModalVisible(false)}>
         <View style={styles.modalContent}>
           <Text style={styles.modalTitle}>Chỉnh sửa đánh giá</Text>
+
           <View style={styles.rate_container}>
             {[...Array(5)].map((_, index) => (
-              <TouchableOpacity key={index} onPress={() => handleStarPress(index)}>
+              <TouchableOpacity key={index} onPress={() => setEditSelectedStars(index + 1)}>
                 <Image
                   source={
                     editSelectedStars > index
@@ -303,6 +302,7 @@ const ReviewScreen = () => {
               </TouchableOpacity>
             ))}
           </View>
+
           <TextInput
             placeholder="Chỉnh sửa đánh giá của bạn"
             style={styles.input}
@@ -310,6 +310,7 @@ const ReviewScreen = () => {
             value={editComment}
             onChangeText={setEditComment}
           />
+
           <TouchableOpacity style={styles.submitButton} onPress={handleUpdateReview}>
             <Text style={styles.submitText}>Cập nhật đánh giá</Text>
           </TouchableOpacity>

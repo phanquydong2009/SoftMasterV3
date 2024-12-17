@@ -13,7 +13,7 @@ import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import BASE_URL from '../component/apiConfig';
 import styles from '../styles/MyCourseDetailScreenStyles';
-import Toast from 'react-native-toast-message'; // Import Toast
+import Toast from 'react-native-toast-message';
 
 const MyCourseDetail = () => {
   const navigation = useNavigation();
@@ -26,7 +26,7 @@ const MyCourseDetail = () => {
   const [completedLessons, setCompletedLessons] = useState({});
 
   useEffect(() => {
-    // Fetch lessons when courseID is available
+    // Fetch lessons
     if (!courseID) return;
 
     const fetchData = async () => {
@@ -47,7 +47,7 @@ const MyCourseDetail = () => {
   }, [courseID]);
 
   useEffect(() => {
-    // Store completed lesson status when testIdDone is available
+  // Lưu trạng thái bài học đã hoàn thành khi có testIdDone
     const storeCompletedLesson = async () => {
       if (testIdDone) {
         try {

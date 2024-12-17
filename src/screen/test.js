@@ -29,6 +29,8 @@ const DetailLesson = () => {
   const [retryTestId, setRetryTestId] = useState(null);
   const timerRef = useRef(null);
 
+
+
   // Fetch dữ liệu video và bài kiểm tra khi có `_id`
   const fetchData = () => {
     setRefreshing(true);
@@ -83,19 +85,19 @@ const DetailLesson = () => {
     setIsPlaying(true);
     setTimeWatched(0);
     setHasWatched(false);
-
+  
     // Quay ngang màn hình khi video bắt đầu phát
     Orientation.lockToLandscape();
-
+  
     timerRef.current = setInterval(() => {
       setTimeWatched((prevTime) => prevTime + 1);
     }, 1000);
   };
-
+  
   const handleStopVideo = () => {
     setIsPlaying(false);
     clearInterval(timerRef.current);
-
+  
     // Quay lại chế độ dọc khi video dừng
     Orientation.lockToPortrait();
   };
@@ -105,7 +107,7 @@ const DetailLesson = () => {
       Orientation.lockToPortrait();
     };
   }, []);
-
+    
 
   const handleGoToQuiz = (testId) => {
     setErrorText('');
@@ -229,9 +231,9 @@ const DetailLesson = () => {
 
 
       {isPlaying && videoLink ? (
-        <View style={{ flex: 1}}>
+        <View style={{ flex: 1 }}>
           <YouTubeIframe
-           height={250}
+            height={videoHeight}
             videoId={videoLink}
             play={true}
             onChangeState={(event) => {
@@ -239,7 +241,6 @@ const DetailLesson = () => {
                 handleStopVideo();
               }
             }}
-            
           />
           <Text
             style={[
@@ -306,23 +307,43 @@ const DetailLesson = () => {
 
       {/* // nút hoàn thành bài test */}
       <View style={styles.btnBottom}>
-        {/* Kiểm tra xem video có đang phát không, nếu đang phát thì ẩn nút */}
-        {!isPlaying && (
-          <TouchableOpacity
-            style={[
-              styles.btnNextLesson,
-              !areAllTestsCompleted && { opacity: 0.5 },
-            ]}
-            disabled={!areAllTestsCompleted}
-            onPress={handleNextLesson}
-          >
-            <Text style={styles.txtNext}>Học bài tiếp theo</Text>
-          </TouchableOpacity>
-        )}
+        <TouchableOpacity
+          style={[
+            styles.btnNextLesson,
+            !areAllTestsCompleted && { opacity: 0.5 },
+          ]}
+          disabled={!areAllTestsCompleted}
+          onPress={handleNextLesson}
+        >
+          <Text style={styles.txtNext}>Học bài tiếp theo</Text>
+        </TouchableOpacity>
       </View>
 
-
-
+      <Modal
+        animationType="fade"
+        transparent={true}
+        visible={modalVisible}
+        onRequestClose={() => setModalVisible(false)}
+      >
+        <View style={styles.modalContainer}>
+          <View style={styles.modalContent}>
+            <Image
+              source={require('../design/image/failPayment.png')}
+              style={styles.modalImage}
+            />
+            <Text style={styles.modalTitle}>Chưa đủ điều kiện làm bài !</Text>
+            <Text style={styles.modalMessage}>
+              Bạn phải xem video bài học đủ thời gian !
+            </Text>
+            <TouchableOpacity
+              style={styles.modalButton}
+              onPress={() => setModalVisible(false)}
+            >
+              <Text style={styles.modalButtonText}>Đã hiểu</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
 
     </View>
 

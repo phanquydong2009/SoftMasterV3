@@ -45,7 +45,7 @@ const SignInScreen = () => {
 
             // Kiểm tra dữ liệu trả về
             if (!userInfo || !userInfo.data || !userInfo.data.user) {
-                throw new Error('Google user info is missing or invalid.');
+                throw new Error('Thông tin người dùng Google bị thiếu hoặc không hợp lệ.');
             }
 
             // Lấy thông tin người dùng từ Google
@@ -68,16 +68,15 @@ const SignInScreen = () => {
 
             const result = await response.json();
             if (!response.ok) {
-                throw new Error(result.message || 'Failed to authenticate with server.');
+                throw new Error(result.message || 'Không thể xác thực với máy chủ.');
             }
 
-            console.log('Server response:', result);
+            console.log('Phản hồi của máy chủ:', result);
 
-            // Sau khi đăng nhập thành công, lấy thông tin _id và name từ phản hồi của server
+            //đăng nhập thành công, lấy thông tin _id và name từ phản hồi của server
             const { _id, name: userName } = result.user;
 
-            // Điều hướng đến màn hình Trang chủ và truyền userID và name
-
+            // truyền userID và name
             navigation.navigate('Tabs', {
                 screen: 'Khóa học',
                 params: { userID: _id, name: userName },
@@ -102,7 +101,7 @@ const SignInScreen = () => {
             });
 
         } catch (error) {
-        
+
             setErrorText(error.message || 'Có lỗi xảy ra, vui lòng thử lại.');
         }
     };
@@ -131,7 +130,7 @@ const SignInScreen = () => {
 
     const handleLogin = async () => {
         let valid = true;
-    
+
         if (email === '') {
             setEmailBorderColor('#FF0000');
             valid = false;
@@ -142,31 +141,31 @@ const SignInScreen = () => {
         } else {
             setEmailBorderColor('#4CAF50');
         }
-    
+
         if (password === '') {
             setPasswordBorderColor('#FF0000');
         } else {
             setPasswordBorderColor('#4CAF50');
         }
-    
+
         if (!valid) {
             if (!errorText) {
                 setErrorText('Vui lòng điền đủ thông tin');
             }
             return;
         }
-    
+
         setErrorText('');
-    
+
         // Gọi API getAll để kiểm tra email
         try {
             const response = await fetch(`${BASE_URL}/user/getAll`);
             const users = await response.json();
-    
+
             const user = users.find(user => user.email === email);
-    
+
             if (user) {
-    
+
                 // Nếu tìm thấy email, gọi API login
                 const loginResponse = await fetch(`${BASE_URL}/user/login`, {
                     method: 'POST',
@@ -178,34 +177,34 @@ const SignInScreen = () => {
                         password,
                     }),
                 });
-    
+
                 const loginData = await loginResponse.json();
-    
+
                 if (loginResponse.ok) {
                     await AsyncStorage.setItem('USER_INFO', JSON.stringify(user));
-    
+
                     console.log('Navigating to HomeScreen with userID:', user._id, 'and name:', user.name);
-    
+
                     // Navigate to different screens with the user data, including currentPassword in the 'Cá nhân' screen
-                    navigation.navigate('Tabs', { 
-                        screen: 'Chứng chỉ', 
-                        params: { userID: user._id } 
+                    navigation.navigate('Tabs', {
+                        screen: 'Chứng chỉ',
+                        params: { userID: user._id }
                     });
-                    navigation.navigate('Tabs', { 
-                        screen: 'Nhắn tin', 
-                        params: { userID: user._id } 
+                    navigation.navigate('Tabs', {
+                        screen: 'Nhắn tin',
+                        params: { userID: user._id }
                     });
-                    navigation.navigate('Tabs', { 
-                        screen: 'Cá nhân', 
-                        params: { userID: user._id, currentPassword: password } 
+                    navigation.navigate('Tabs', {
+                        screen: 'Cá nhân',
+                        params: { userID: user._id, currentPassword: password }
                     });
-                    navigation.navigate('Tabs', { 
-                        screen: 'Khóa học', 
-                        params: { userID: user._id } 
+                    navigation.navigate('Tabs', {
+                        screen: 'Khóa học',
+                        params: { userID: user._id }
                     });
-                    navigation.navigate('Tabs', { 
-                        screen: 'Trang chủ', 
-                        params: { userID: user._id, name: user.name } 
+                    navigation.navigate('Tabs', {
+                        screen: 'Trang chủ',
+                        params: { userID: user._id, name: user.name }
                     });
                 } else {
                     if (loginData.message === 'Incorrect password') {
@@ -224,8 +223,8 @@ const SignInScreen = () => {
             console.error('Fetch error:', error);
         }
     };
-    
-    
+
+
     return (
         <KeyboardAvoidingView style={styles.container} behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
             <ScrollView contentContainerStyle={{ flexGrow: 1 }} showsVerticalScrollIndicator={false}>

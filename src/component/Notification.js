@@ -2,11 +2,11 @@ import { StyleSheet, Text, View, TouchableOpacity, Image } from 'react-native';
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import BASE_URL from './apiConfig';
-import { useNavigation } from '@react-navigation/native';  // Thêm useNavigation
+import { useNavigation } from '@react-navigation/native'; 
 
 const Notification = ({ userID }) => {
     const [notificationCount, setNotificationCount] = useState(0);
-    const navigation = useNavigation();  // Khai báo navigation
+    const navigation = useNavigation();
 
     useEffect(() => {
         const fetchNotifications = async () => {

@@ -191,51 +191,63 @@ const ProfileMentor = () => {
       if (!courseData.length) setNoCoursesMessage("Chưa có khóa học nào");
     };
 
-    // Hàm lấy danh sách đánh giá từ API
     const fetchFeedback = async () => {
-      const response = await axios.get(`${BASE_URL}/feedbackTeacher/getFeedbackByTeacherID/${_id}`);
+      try {
+        const response = await axios.get(`${BASE_URL}/feedbackTeacher/getFeedbackByTeacherID/${_id}`);
+    
+        const feedbackData = response.data.length
+          ? await Promise.all(
+              response.data.map(async feedback => {
+                let userAvatar = feedback.userID?.avatar;
+    
+                // Nếu không có avatar, lấy avatar từ API get userByID
+                if (!userAvatar && feedback.userID?._id) {
+                  try {
+                    const userResponse = await axios.get(`${BASE_URL}/user/getUserByID/${feedback.userID._id}`);
+                    userAvatar = userResponse.data?.avatar;
+                  } catch (userError) {
+                    // Xử lý lỗi nếu cần
+                  }
+                }
+    
+                // Nếu không có avatar, dùng ảnh mặc định
+                const avatarImage = userAvatar ? { uri: userAvatar } : require('../design/image/noprofile.png');
+    
+                // Định dạng lại ngày tạo theo DD/MM/YYYY
+                const formattedDate = feedback.feedbackDetail
+                  ? new Date(feedback.feedbackDetail.createdAt).toLocaleDateString('en-GB')
+                  : 'Ngày không xác định'; // 'en-GB' sẽ sử dụng định dạng DD/MM/YYYY
+    
+                return {
+                  id: feedback._id,
+                  name: feedback.userID?.name || "Ẩn danh",
+                  img: avatarImage,
+                  rating: feedback.feedbackDetail?.rating || 0,
+                  comment: feedback.feedbackDetail?.content || "Không có nhận xét",
+                  love: '0',
+                  createdAt: formattedDate,
+                };
+              })
+            )
+          : [];
+    
+        // Sắp xếp đánh giá theo ngày tạo (mới nhất ở trên cùng)
+        feedbackData.sort((a, b) => {
+          const dateA = new Date(a.createdAt.split('/').reverse().join('-')); 
+          const dateB = new Date(b.createdAt.split('/').reverse().join('-'));
+          return dateB - dateA; // Sắp xếp từ mới đến cũ
+        });
+    
+        setData(feedbackData);
+        setFeedbackCount(feedbackData.length);
+    
+        if (!feedbackData.length) setNoCoursesMessage("Không có đánh giá nào");
+      } catch (error) {
 
-      const feedbackData = response.data.length
-        ? await Promise.all(
-          response.data.map(async feedback => {
-            let userAvatar = feedback.userID?.avatar;
-
-            // Nếu không có avatar, lấy avatar từapi get userByID
-            if (!userAvatar && feedback.userID?._id) {
-              try {
-                const userResponse = await axios.get(`${BASE_URL}/user/getUserByID/${feedback.userID._id}`);
-                userAvatar = userResponse.data?.avatar;
-              } catch (userError) {
-                // Xử lý lỗi nếu cần
-              }
-            }
-
-            // Nếu không có avatar, dùng ảnh mặc định
-            const avatarImage = userAvatar ? { uri: userAvatar } : require('../design/image/noprofile.png');
-
-            return {
-              id: feedback._id,
-              name: feedback.userID?.name || "Không có tên người dùng",
-              img: avatarImage,
-              rating: feedback.feedbackDetail?.rating || 0,
-              comment: feedback.feedbackDetail?.content || "Không có nhận xét",
-              love: '0',
-              createdAt: feedback.feedbackDetail
-                ? new Date(feedback.feedbackDetail.createdAt).toLocaleDateString()
-                : 'Ngày không xác định',
-            };
-          })
-        )
-        : [];
-
-      // Sắp xếp đánh giá theo ngày tạo, mới nhất ở trên cùng
-      feedbackData.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-
-      setData(feedbackData);
-      setFeedbackCount(feedbackData.length);
-
-      if (!feedbackData.length) setNoCoursesMessage("Không có đánh giá nào");
+        setNoCoursesMessage("Có lỗi xảy ra khi lấy đánh giá.");
+      }
     };
+    
 
     // Hàm chung để gọi hàm lấy dữ liệu, có thể là khóa học hoặc đánh giá
     const fetchContent = async () => {

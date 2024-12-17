@@ -1,6 +1,6 @@
 
 // Đông Dev
-const BASE_URL = 'http://192.168.1.37:3001';
+const BASE_URL = 'http://192.168.1.45:3001';
 
 // trường 
 // const BASE_URL = 'http://192.168.184.58:3001';
